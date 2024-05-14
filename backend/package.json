@@ -1,0 +1,13 @@
+{
+  "name": "package.json",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^5.13.0",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "mongodb": "^6.6.1",
+    "prisma": "^5.13.0"
+  }
+}
