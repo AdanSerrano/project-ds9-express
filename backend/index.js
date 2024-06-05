@@ -28,7 +28,12 @@ app.get('/test', async (req, res) => {
 //get all users
 app.get('/users', async (req, res) => {
     try {
-        const users = await prisma.user.findMany();
+        const users = await prisma.user.findMany({
+            where: {
+                role: Role.USER
+            }
+        });
+        // console.log(users)
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -44,31 +49,39 @@ app.get('/users/:id', async (req, res) => {
                 id: String(id)
             }
         });
-
         res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 
 //create user
 app.post('/users', async (req, res) => {
+    const { name, email, password } = req.body;
+
     try {
-        const { name, email, password } = req.body;
-        const hashedPassword = await bcryptjs.hash(password, 10)
-        const user = await prisma.user.create({
-            data: {
-                name: name,
-                email: email,
-                password: hashedPassword,
-                role: Role.USER,
-                createdAt: new Date(),
-                updatedAt: new Date()
+        const existingUser = await prisma.user.findFirst({
+            where: {
+                email: email
             }
         });
-        res.status(201).json(user);
+
+        if (existingUser) {
+            return res.status(400).json({ error: 'Usuario existe' });
+        }
+
+        const hashedPassword = await bcryptjs.hash(password, 10);
+        const user = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                role: Role.USER
+            }
+        });
+        res.status(201).json({ user, success: 'Usuario creado satisfactoriamente' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 
@@ -79,20 +92,12 @@ app.put('/users/:id', async (req, res) => {
         const updatedUser = await prisma.user.update({
             where: {
                 id: String(id),
-            },
-            data: {
-                name: 'Adan Doe',
-                email: 'adanu0adf503@gmail.com',
-                password: 'password',
-                role: Role.ADMIN,
-                createdAt: new Date(),
-                updatedAt: new Date()
             }
         });
 
         res.status(200).json(updatedUser);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 
@@ -106,9 +111,12 @@ app.delete('/users/:id', async (req, res) => {
                 id: String(id)
             }
         });
-        res.status(201).json(user);
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no existe' });
+        }
+        res.status(200).json({ success: 'Usuario eliminando satifactoriamente' });
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        res.status(500).json({ error: error.message })
     }
 
 })
