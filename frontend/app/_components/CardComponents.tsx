@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { start } from "repl";
 import { toast } from "sonner";
 
 interface CardComponentsProps {
@@ -12,26 +13,26 @@ interface CardComponentsProps {
 }
 
 export const CardComponents = ({ id, name, email }: CardComponentsProps) => {
-
+    const [isPending, startTransition] = useTransition()
     useEffect(() => {
         console.log('CardComponentsProps', { id, name, email })
     }, [id, name, email])
 
-    async function onClick() {
-        try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-            const response = await axios.delete(`${apiUrl}/users/${id}`);
-            setTimeout(() => {
+    function onClick() {
+        startTransition(async () => {
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+                const response = await axios.delete(`${apiUrl}/users/${id}`);
+                if (response.data.success) {
+                    toast(response.data.success)
+                } else {
+                    toast(response.data.error)
+                }
                 location.pathname = '/'
-            }, 1500);
-            if (response.data.success) {
-                toast(response.data.success)
-            } else {
-                toast(response.data.error)
+            } catch (error) {
+                console.log('error deleting user', error)
             }
-        } catch (error) {
-            console.log('error deleting user', error)
-        }
+        })
     }
 
     return (
@@ -45,7 +46,7 @@ export const CardComponents = ({ id, name, email }: CardComponentsProps) => {
                     <div className="line-clamp-1">{id}</div>
                     <Button
                         variant={'destructive'}
-                        // onClick={() => deleteUser(user.id)}
+                        disabled={isPending}
                         onClick={onClick}
                     >Delete</Button>
                 </CardFooter>

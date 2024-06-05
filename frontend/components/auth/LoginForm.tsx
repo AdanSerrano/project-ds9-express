@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormError } from '@/app/_components/FormError'
 import { FormSuccess } from '@/app/_components/FormSuccess'
-import { RegisterSchema } from '@/schema'
+import { LoginSchema } from '@/schema'
 import axios from 'axios'
 import { PasswordInput } from '../ui/input-password'
 
@@ -25,18 +25,14 @@ interface User {
     email?: string;
 }
 
-export const RegisterForm = () => {
+export const LoginForm = () => {
     const [isPending, startTransition] = useTransition()
-    const [users, setUsers] = useState<User[]>([]);
-    const [newUser, setNewUser] = useState<User>({});
     const [success, setSuccess] = useState<string | undefined>('');
     const [error, setError] = useState<string | undefined>('');
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-    const form = useForm<z.infer<typeof RegisterSchema>>({
-        resolver: zodResolver(RegisterSchema),
+    const form = useForm<z.infer<typeof LoginSchema>>({
+        resolver: zodResolver(LoginSchema),
         defaultValues: {
-            name: "",
             email: "",
             password: "",
         },
@@ -44,60 +40,18 @@ export const RegisterForm = () => {
 
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof RegisterSchema>) {
+    async function onSubmit(values: z.infer<typeof LoginSchema>) {
         setError('');
         setSuccess('');
-        startTransition(async () => {
-            try {
-                const response = await axios.post(`${apiUrl}/users`, values);
-                setUsers([...users, response.data]);
-                setNewUser(response.data);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-                if (response.data.success) {
-                    setSuccess(response.data.success);
-                    toast(response.data.success);
-                    form.reset();
-                } else {
-                    setError(response.data.error);
-                }
-            } catch (error: unknown) {
-                if (axios.isAxiosError(error)) {
-                    if (error.response) {
-                        setError(error.response.data.error);
-                    } else {
-                        setError('An unexpected error occurred');
-                    }
-                } else {
-                    console.error('Unexpected error:', error);
-                    setError('An unexpected error occurred');
-                }
-            }
-        })
+        console.log(values)
     }
     return (
-        <CardWrapper headerLabel='Registro' backButtonLabel='¿Ya tienes una cuenta?, Inicia Sesión.' backButtonHref='/auth/login' >
+        <CardWrapper headerLabel='Ingreso' backButtonLabel='¿Eres Nuevo?, Registrate.' backButtonHref='/auth/register' >
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
                     <section className='space-y-4'>
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            disabled={isPending}
-                                            type='name'
-                                            placeholder="Example name"
-                                            {...field}
-                                        />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
                         <FormField
                             control={form.control}
                             name="email"
