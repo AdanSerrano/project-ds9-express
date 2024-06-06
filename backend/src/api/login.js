@@ -6,28 +6,27 @@ const prisma = new PrismaClient();
 
 router.post("/", async (req, res) => {
   try {
-    const body = req.body;
+    const { email, password } = req.body;
 
-    const userInfo = await prisma.user.findMany({
+    const existingUser = await prisma.user.findUnique({
       where: {
-        email: body.bodyemail,
+        email: email,
       },
     });
 
-    console.log(userInfo);
-
-    if (!user) {
-      return res.status(400).json({ message: "Usuario o contraseña incorrecta" });
+    if (!existingUser) {
+      return res.status(404).json({ error: "Usuario no existe" });
     }
 
-    bcryptjs.compare(password, user.password).then((isValid) => {
-      if (!isValid) {
-        return res.status(400).json({ message: "Usuario o contraseña incorrecta" });
-      }
-      return res.status(200).json({ message: "Login exitoso" });
-    });
+    const isValid = await bcryptjs.compare(password, existingUser.password);
+
+    if (!isValid) {
+      return res.status(401).json({ error: "Usuario o contraseña incorrecta" });
+    }
+
+    return res.status(200).json({ success: "Login exitoso" });
   } catch (error) {
-    console.log("Error in /api/login/");
+    console.log("Error in /login/");
     console.error(error);
   }
 });

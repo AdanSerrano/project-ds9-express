@@ -1,6 +1,7 @@
 'use client'
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { apiUrl } from "@/lib/api-url";
 import axios from "axios";
 import { useEffect, useState, useTransition } from "react";
 import { start } from "repl";
@@ -21,14 +22,15 @@ export const CardComponents = ({ id, name, email }: CardComponentsProps) => {
     function onClick() {
         startTransition(async () => {
             try {
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
                 const response = await axios.delete(`${apiUrl}/users/${id}`);
                 if (response.data.success) {
-                    toast(response.data.success)
+                    toast.success(response.data.success)
                 } else {
-                    toast(response.data.error)
+                    toast.error(response.data.error)
                 }
-                location.pathname = '/'
+                setTimeout(() => {
+                    location.pathname = '/'
+                }, 1500);
             } catch (error) {
                 console.log('error deleting user', error)
             }

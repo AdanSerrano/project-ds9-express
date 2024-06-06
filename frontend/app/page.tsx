@@ -21,6 +21,7 @@ import { FormSuccess } from "./_components/FormSuccess";
 import { FormError } from "./_components/FormError";
 import { toast } from "sonner";
 import { RegisterSchema } from "@/schema";
+import { apiUrl } from "@/lib/api-url";
 
 interface User {
   id?: string;
@@ -29,12 +30,7 @@ interface User {
 }
 
 export default function Home() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
   const [users, setUsers] = useState<User[]>([]);
-  const [newUser, setNewUser] = useState<User>({});
-  const [updateUser, setUpdateUser] = useState<User>({});
-  const [sucess, setSucess] = useState<string | undefined>('');
-  const [error, setError] = useState<string | undefined>('');
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -57,10 +53,10 @@ export default function Home() {
       }
     }
     fetchData();
-  }, [apiUrl, newUser]);
+  }, []);
 
   return (
-    <main className="relative bg-black-100 flex justify-center items-center flex-col overflow-hidden mx-auto w-full h-full min-h-screen sm:px-10 px-5">
+    <main className="relative flex justify-center items-center flex-col mx-auto w-full h-full min-h-screen sm:px-10 px-5">
       <div className="grid grid-cols-3 gap-2">
         {users.map((user, index) => (
           <div key={index}>

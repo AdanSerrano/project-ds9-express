@@ -18,6 +18,8 @@ import { FormSuccess } from '@/app/_components/FormSuccess'
 import { RegisterSchema } from '@/schema'
 import axios from 'axios'
 import { PasswordInput } from '../ui/input-password'
+import { apiUrl } from '@/lib/api-url'
+import { useRouter } from 'next/navigation'
 
 interface User {
     id?: string;
@@ -31,7 +33,7 @@ export const RegisterForm = () => {
     const [newUser, setNewUser] = useState<User>({});
     const [success, setSuccess] = useState<string | undefined>('');
     const [error, setError] = useState<string | undefined>('');
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const router = useRouter()
 
     const form = useForm<z.infer<typeof RegisterSchema>>({
         resolver: zodResolver(RegisterSchema),
@@ -52,13 +54,11 @@ export const RegisterForm = () => {
                 const response = await axios.post(`${apiUrl}/users`, values);
                 setUsers([...users, response.data]);
                 setNewUser(response.data);
-
                 if (response.data.success) {
                     setSuccess(response.data.success);
                     toast(response.data.success);
                     form.reset();
-                } else {
-                    setError(response.data.error);
+                    router.push('/auth/login');
                 }
             } catch (error: unknown) {
                 if (axios.isAxiosError(error)) {
