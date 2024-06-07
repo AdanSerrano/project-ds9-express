@@ -3,6 +3,7 @@ const bcryptjs = require("bcryptjs");
 const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+var jwt = require('jsonwebtoken');
 
 router.post("/", async (req, res) => {
   try {
@@ -24,7 +25,12 @@ router.post("/", async (req, res) => {
       return res.status(401).json({ error: "Usuario o contraseña incorrecta" });
     }
 
-    return res.status(200).json({ success: "Login exitoso" });
+    const token = jwt.sign({ id: existingUser.id }, process.env.JWT_SECRET || 'secret', {
+      expiresIn: 60 * 60 * 24
+    });
+
+    const user = existingUser;
+    return res.status(200).json({ user, token, success: "Login exitoso" });
   } catch (error) {
     console.log("Error in /login/");
     console.error(error);

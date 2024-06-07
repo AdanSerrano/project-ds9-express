@@ -1,35 +1,27 @@
 'use client'
-
-import * as z from 'zod'
-
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
-import { useState, useTransition } from 'react'
-
-import { Button } from '@/components/ui/button'
-import { CardWrapper } from "@/components/auth/CardWrapper"
-import { Input } from '@/components/ui/input'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { FormError } from '@/app/_components/FormError'
-import { FormSuccess } from '@/app/_components/FormSuccess'
-import { LoginSchema } from '@/schema'
-import { PasswordInput } from '../ui/input-password'
-import axios from 'axios'
-import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
-import { apiUrl } from '@/lib/api-url'
-
-interface User {
-    id?: string;
-    name?: string;
-    email?: string;
-}
+import React, { useContext, useState, useTransition } from "react";
+import * as z from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Button } from '@/components/ui/button';
+import { CardWrapper } from "@/components/auth/CardWrapper";
+import { Input } from '@/components/ui/input';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FormError } from '@/app/_components/FormError';
+import { FormSuccess } from '@/app/_components/FormSuccess';
+import { LoginSchema } from '@/schema';
+import { PasswordInput } from '../ui/input-password';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { apiUrl } from '@/lib/api-url';
+import { GlobalState } from '@/context/global-state';
 
 export const LoginForm = () => {
-    const [isPending, startTransition] = useTransition()
+    const [isPending, startTransition] = useTransition();
     const [success, setSuccess] = useState<string | undefined>('');
     const [error, setError] = useState<string | undefined>('');
-    const router = useRouter()
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -37,20 +29,22 @@ export const LoginForm = () => {
             email: "",
             password: "",
         },
-    })
+    });
 
-
-    // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof LoginSchema>) {
-        setError('')
-        setSuccess('')
+    const { setLogin } = useContext(GlobalState);
+    const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+        setError('');
+        setSuccess('');
         startTransition(async () => {
             try {
-                const response = await axios.post(`${apiUrl}/login`, values)
+                const response = await axios.post(`${apiUrl}/login`, values);
+                console.log(response.data.user, response.data.token);
+                setLogin(response.data.user, response.data.token);
+
                 if (response.data.success) {
-                    setSuccess(response.data.success)
-                    toast.success(response.data.success)
-                    router.push('/')
+                    setSuccess(response.data.success);
+                    toast.success(response.data.success);
+                    router.push('/dashboard');
                 }
             } catch (error: unknown) {
                 if (axios.isAxiosError(error)) {
@@ -65,9 +59,8 @@ export const LoginForm = () => {
                     setError('An unexpected error occurred');
                 }
             }
-        })
-    }
-
+        });
+    };
 
     return (
         <CardWrapper headerLabel='Ingreso' backButtonLabel='¿Eres Nuevo?, Registrate.' backButtonHref='/auth/register' >
@@ -88,7 +81,6 @@ export const LoginForm = () => {
                                             {...field}
                                         />
                                     </FormControl>
-
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -106,7 +98,6 @@ export const LoginForm = () => {
                                             {...field}
                                         />
                                     </FormControl>
-
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -119,10 +110,10 @@ export const LoginForm = () => {
                         type="submit"
                         disabled={isPending}
                     >
-                        Registro
+                        Ingreso
                     </Button>
                 </form>
             </Form>
         </CardWrapper>
-    )
-}
+    );
+};
