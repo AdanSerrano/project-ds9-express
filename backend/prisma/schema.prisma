@@ -28,3 +28,37 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Client {
+  id          Int      @id @default(autoincrement())
+  name        String
+  lastname    String
+  phoneNumber String
+  createdDate DateTime @default(now())
+  updatedDate DateTime @updatedAt
+
+  sales       Sale[]
+}
+
+model Sale {
+  id          Int         @id @default(autoincrement())
+  clientId    Int
+  client      Client      @relation(fields: [clientId], references: [id])
+  saleDate    DateTime    @default(now())
+  createdDate DateTime    @default(now())
+  updatedDate DateTime    @updatedAt
+
+  details     SaleDetail[]
+}
+
+model SaleDetail {
+  id          Int      @id @default(autoincrement())
+  saleId      Int
+  sale        Sale     @relation(fields: [saleId], references: [id])
+  product     String
+  quantity    Int
+  price       Float
+  total       Float
+  createdDate DateTime @default(now())
+  updatedDate DateTime @updatedAt
+}
