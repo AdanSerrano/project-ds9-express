@@ -57,7 +57,7 @@ router.put('/:id', async (req, res) => {
     try {
         const updatedClient = await prisma.client.update({
             where: {
-                id: Number(id),
+                id: id,
             },
             data: {
                 name,
@@ -79,7 +79,7 @@ router.delete('/:id', async (req, res) => {
     try {
         const client = await prisma.client.delete({
             where: {
-                id: Number(id)
+                id: id
             }
         });
         res.status(200).json({ success: 'Cliente eliminado satisfactoriamente' });

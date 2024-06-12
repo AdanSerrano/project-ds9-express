@@ -8,7 +8,9 @@ const app = express();
 
 require('dotenv').config();
 
+const clientRouter = require('./src/api/client');
 const loginRouter = require('./src/api/login');
+const salesRouter = require('./src/api/sale');
 const usersRouter = require('./src/api/users');
 
 app.use(express.json())
@@ -20,8 +22,10 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/login', loginRouter);
-app.use('/users', usersRouter);
+app.use('/api/clients', clientRouter);
+app.use('/api/login', loginRouter);
+app.use('/api/sales', salesRouter);
+app.use('/api/users', usersRouter);
 
 // start server 
 const PORT = process.env.PORT || 4000;
