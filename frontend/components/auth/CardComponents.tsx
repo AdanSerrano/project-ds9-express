@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiUrl } from "@/lib/api-url";
 import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -49,6 +50,11 @@ export const CardComponents = ({ id, name, email }: CardComponentsProps) => {
                     >
                         Delete
                     </Button>
+                    <Link
+                        href={`/users/${id}`}
+                    >
+                        ver
+                    </Link>
                 </CardFooter>
             </Card>
         </>

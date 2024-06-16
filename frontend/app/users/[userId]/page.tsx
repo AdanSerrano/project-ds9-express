@@ -10,9 +10,6 @@ export default function UserIdPage({ params }: { params: { userId: string } }) {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    console.log('params', params.userId)
-    console.log('user', user)
-
     useEffect(() => {
         const fetchData = async () => {
             try {

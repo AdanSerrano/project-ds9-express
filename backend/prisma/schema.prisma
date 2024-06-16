@@ -37,7 +37,6 @@ model Client {
   phoneNumber String
   createdDate DateTime @default(now())
   updatedDate DateTime @updatedAt
-  saleId      String   @db.ObjectId
   sales       Sale[]   @relation("ClientToSale")
 }
 
@@ -47,7 +46,7 @@ model Sale {
   createdDate DateTime     @default(now())
   updatedDate DateTime     @updatedAt
   clientId    String       @db.ObjectId
-  clients     Client       @relation("ClientToSale", fields: [clientId], references: [id])
+  clients     Client       @relation("ClientToSale", fields: [clientId], references: [id], onDelete: Cascade)
   details     SaleDetail[] @relation("SaleToSaleDetail")
 
   @@index([clientId])
@@ -62,7 +61,7 @@ model SaleDetail {
   createdDate DateTime @default(now())
   updatedDate DateTime @updatedAt
   saleId      String   @db.ObjectId
-  sales       Sale     @relation("SaleToSaleDetail", fields: [saleId], references: [id])
+  sales       Sale     @relation("SaleToSaleDetail", fields: [saleId], references: [id], onDelete: Cascade)
 
   @@index([saleId])
 }
