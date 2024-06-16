@@ -15,7 +15,6 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { apiUrl } from '@/lib/api-url';
-import { GlobalState } from '@/context/global-state';
 
 export const LoginForm = () => {
     const [isPending, startTransition] = useTransition();
@@ -31,16 +30,12 @@ export const LoginForm = () => {
         },
     });
 
-    const { setLogin } = useContext(GlobalState);
     const onSubmit = (values: z.infer<typeof LoginSchema>) => {
         setError('');
         setSuccess('');
         startTransition(async () => {
             try {
-                const response = await axios.post(`${apiUrl}/login`, values);
-                console.log(response.data.user, response.data.token);
-                setLogin(response.data.user, response.data.token);
-
+                const response = await axios.post(`${apiUrl}/api/login`, values);
                 if (response.data.success) {
                     setSuccess(response.data.success);
                     toast.success(response.data.success);

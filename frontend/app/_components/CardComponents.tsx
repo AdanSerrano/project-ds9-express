@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiUrl } from "@/lib/api-url";
 import axios from "axios";
-import { useEffect, useState, useTransition } from "react";
-import { start } from "repl";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface CardComponentsProps {
@@ -14,27 +14,22 @@ interface CardComponentsProps {
 }
 
 export const CardComponents = ({ id, name, email }: CardComponentsProps) => {
-    const [isPending, startTransition] = useTransition()
-    useEffect(() => {
-        console.log('CardComponentsProps', { id, name, email })
-    }, [id, name, email])
+    const [loading, setLoading] = useState(false)
+    const router = useRouter()
 
-    function onClick() {
-        startTransition(async () => {
-            try {
-                const response = await axios.delete(`${apiUrl}/users/${id}`);
-                if (response.data.success) {
-                    toast.success(response.data.success)
-                } else {
-                    toast.error(response.data.error)
-                }
-                setTimeout(() => {
-                    location.pathname = '/'
-                }, 1500);
-            } catch (error) {
-                console.log('error deleting user', error)
-            }
-        })
+    const onDelete = async () => {
+        try {
+            setLoading(true)
+            const response = await axios.delete(`${apiUrl}/api/users/${id}`);
+            router.push('/users')
+            router.refresh()
+            toast.success(response.data.success)
+        } catch (error) {
+            console.log('error deleting user', error)
+        } finally {
+            setLoading(false)
+        }
+
     }
 
     return (
@@ -46,11 +41,14 @@ export const CardComponents = ({ id, name, email }: CardComponentsProps) => {
                 </CardHeader>
                 <CardFooter className="flex gap-3">
                     <div className="line-clamp-1">{id}</div>
+
                     <Button
                         variant={'destructive'}
-                        disabled={isPending}
-                        onClick={onClick}
-                    >Delete</Button>
+                        disabled={loading}
+                        onClick={onDelete}
+                    >
+                        Delete
+                    </Button>
                 </CardFooter>
             </Card>
         </>

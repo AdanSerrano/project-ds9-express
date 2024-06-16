@@ -20,12 +20,8 @@ import axios from 'axios'
 import { PasswordInput } from '../ui/input-password'
 import { apiUrl } from '@/lib/api-url'
 import { useRouter } from 'next/navigation'
+import { User } from '@/interface'
 
-interface User {
-    id?: string;
-    name?: string;
-    email?: string;
-}
 
 export const RegisterForm = () => {
     const [isPending, startTransition] = useTransition()
@@ -51,7 +47,7 @@ export const RegisterForm = () => {
         setSuccess('');
         startTransition(async () => {
             try {
-                const response = await axios.post(`${apiUrl}/users`, values);
+                const response = await axios.post(`${apiUrl}/api/users`, values);
                 setUsers([...users, response.data]);
                 setNewUser(response.data);
                 if (response.data.success) {
