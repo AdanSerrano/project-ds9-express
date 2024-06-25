@@ -2,10 +2,10 @@
 import Image from "next/image";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { CardComponents } from "../../components/auth/CardComponents";
 import Link from "next/link";
 import { apiUrl } from "@/lib/api-url";
 import { User } from "@/interface";
+import { CardComponents } from "@/components/auth/CardComponents";
 
 
 export default function Home() {

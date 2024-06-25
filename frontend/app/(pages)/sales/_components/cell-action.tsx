@@ -35,7 +35,7 @@ export const CellAction = ({ data }: CellActionProps) => {
     const onDelete = async () => {
         try {
             setLoading(true)
-            await axios.delete(`${apiUrl}/api/sales/${data.id}`)
+            await axios.delete(`${apiUrl}/api/sales/${data.clientId}`)
             router.push(`/sales`)
             router.refresh()
             toast.success("sales deleted successfully")

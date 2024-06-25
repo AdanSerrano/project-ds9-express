@@ -4,6 +4,9 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Spotlight } from "@/components/ui/spotlight";
+import { FloatingNav } from "@/components/ui/FloatingNavbar";
+import { navItems } from "@/data";
+import { Footer } from "@/components/Footer";
 
 
 const poppins = Montserrat({
@@ -25,16 +28,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={poppins.className} suppressHydrationWarning>
+      <body className={`${poppins.className} bg-black-100`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <div className="relative z-10">
-            {children}
-          </div>
+          {children}
           <Toaster />
         </ThemeProvider>
       </body>

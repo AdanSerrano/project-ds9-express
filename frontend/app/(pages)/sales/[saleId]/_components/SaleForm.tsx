@@ -42,13 +42,15 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
     const toastMessage = initialData ? 'Edit a Sale' : 'Sale Created.';
     const action = initialData ? 'Save Change' : 'Create';
 
+    console.log(initialData)
     const form = useForm<SaleFormValues>({
         resolver: zodResolver(SaleSchema),
-        defaultValues: {
-            clientId: '',
-            saleDate: new Date(),
-            details: [{ product: '', quantity: 1, price: 0 }],
-        },
+        defaultValues: initialData ?
+            initialData : {
+                clientId: '',
+                saleDate: new Date(),
+                details: [{ product: '', quantity: 1, price: 0 }],
+            },
     });
     const { fields, append, remove } = useFieldArray({
         control: form.control,
@@ -56,19 +58,16 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
     });
 
     const onSubmit = (values: SaleFormValues) => {
-        console.log(values);
         const transformedValues = {
             ...values,
             saleDate: values.saleDate ? new Date(values.saleDate) : new Date(), // Asegúrate de que saleDate sea una fecha válida
             details: values.details.map(detail => ({
                 ...detail,
-                quantity: Number(detail.quantity),
+                quantity: Number(detail),
                 price: Number(detail.price),
                 total: Number(detail.quantity) * Number(detail.price) // Calcula el total por producto
             }))
         };
-
-        console.log(transformedValues);
 
         setError('');
         setSuccess('');
@@ -143,7 +142,7 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
                             name="clientId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Client ID</FormLabel>
+                                    <FormLabel className='text-white'>Client ID</FormLabel>
                                     <FormControl>
                                         <Input disabled={isPending} placeholder="Client ID" {...field} />
                                     </FormControl>
@@ -156,7 +155,7 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
                             name="saleDate"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                    <FormLabel>Date of birth</FormLabel>
+                                    <FormLabel className='text-white'>Date of birth</FormLabel>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <FormControl>
@@ -199,7 +198,7 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
                                     name={`details.${index}.product`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Product</FormLabel>
+                                            <FormLabel className='text-white'>Product</FormLabel>
                                             <FormControl>
                                                 <Input disabled={isPending} placeholder="Product Name" {...field} />
                                             </FormControl>
@@ -212,7 +211,7 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
                                     name={`details.${index}.quantity`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Quantity</FormLabel>
+                                            <FormLabel className='text-white'>Quantity</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -231,7 +230,7 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
                                     name={`details.${index}.price`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Price</FormLabel>
+                                            <FormLabel className='text-white'>Price</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
