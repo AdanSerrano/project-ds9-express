@@ -1,33 +1,30 @@
 class AuthController {
-    private service: any;
-    private verification: any;
+    private authService: any;
+    private verificationService: any;
 
     constructor(authService: any, verificationService: any) {
-        this.service = authService;
-        this.verification = verificationService;
+        this.authService = authService;
+        this.verificationService = verificationService;
     }
 
-    async login(email: string, password: string) {
+    async login(email: string, password: string): Promise<string> {
         if (!email.trim() || !password.trim()) {
             throw new Error('Email and password are required.');
         }
 
-        const existingUser = await this.service.findUnique(email);
+        const existingUser = await this.authService.findUnique(email);
 
         if (!existingUser) {
-            throw new Error('User ID is required');
+            throw new Error('User not found.');
         }
 
-        const isValid = await this.verification.comparePasswords(
-            password,
-            existingUser.password
-        );
+        const isValid = await this.verificationService.comparePasswords(password, existingUser.password);
 
         if (!isValid) {
-            throw new Error('usuario o contraseña incorrecta ');
+            throw new Error('Invalid email or password.');
         }
 
-        const accessToken = this.verification.generateToken({
+        const accessToken = this.verificationService.generateToken({
             userInfo: {
                 name: existingUser.name,
                 email: existingUser.email,
@@ -38,7 +35,27 @@ class AuthController {
         return accessToken;
     }
 
-    async register() { }
+    async register(name: string, email: string, password: string) {
+        if (!name.trim() || !email.trim() || !password.trim()) {
+            throw new Error('Name, email, and password are required.');
+        }
+
+        const existingUser = await this.authService.findUnique(email);
+
+        if (existingUser) {
+            throw new Error('User already exists.');
+        }
+
+        const hashedPassword = await this.verificationService.hashPassword(password);
+
+        await this.authService.create({
+            name,
+            email,
+            password: hashedPassword,
+        });
+
+        return;
+    }
 }
 
-module.exports = AuthController;
+export default AuthController;
