@@ -1,35 +1,42 @@
 import { Request, Response, NextFunction } from 'express';
 import VerificationService from '../model/services/verification.services';
+import { error } from 'console';
 
 const verifyTokenMiddleware = (request: Request, response: Response, next: NextFunction): void => {
     // Extract cookies from request
-    const { cookies } = request;
+    const service = new VerificationService();
 
-    // Extract JWT from cookies
-    const token = cookies.jwt;
+    const tokenInfo = request.header('Authorization');
 
-    // If no token, return 401
-    if (!token) {
-        response.status(401).json('No está autorizado');
+    if (!tokenInfo) {
+        response.status(401).json({
+            message: 'No está autorizado',
+            errorMessages: true,
+        });
         return;
     }
 
-    const service = new VerificationService();
+    const token = tokenInfo.split(' ')[1];
+
+    if (!token) {
+        response.status(401).json({
+            message: 'No está autorizado 99',
+            errorMessages: true,
+        });
+        return;
+    }
 
     try {
         const user = service.verifyToken(token);
-
-        if (!user) {
-            response.status(403).json('No está autorizado');
-            return;
-        }
-
-        request.body.user = user;
         next();
     } catch (error) {
-        response.status(403).json('No está autorizado');
-        return; // Ensure the function returns here to avoid type error
+        response.status(401).json({
+            message: 'No está autorizado98',
+            errorMessages: true,
+        });
+        return;
     }
+
 };
 
 export default verifyTokenMiddleware;

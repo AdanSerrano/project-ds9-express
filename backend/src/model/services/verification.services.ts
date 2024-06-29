@@ -1,30 +1,49 @@
-import * as bcryptjs from 'bcryptjs';
-import * as jwt from 'jsonwebtoken';
+require("dotenv").config();
+import * as bcryptjs from "bcryptjs";
+import * as jwt from "jsonwebtoken";
 
 class VerificationService {
-    private secret: string;
+  private secret: string;
 
-    constructor() {
-        this.secret = 'default_secret'; // Default value for secret
-    }
+  constructor() {
+    this.secret = "default_secret"; // Default value for secret
+  }
 
-    async comparePasswords(incomingPassword: string, encryptedPassword: string): Promise<boolean> {
-        return bcryptjs.compare(incomingPassword, encryptedPassword);
-    }
+  async hashPassword(password: string): Promise<string> {
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    return hashedPassword;
+  }
 
-    generateToken(payload: object): string {
-        return jwt.sign(payload, this.secret, {
-            expiresIn: 60 * 60 * 24, // 24 hours
-        });
-    }
+  async comparePasswords(
+    incomingPassword: string,
+    encryptedPassword: string
+  ): Promise<boolean> {
+    return bcryptjs.compare(incomingPassword, encryptedPassword);
+  }
 
-    verifyToken(token: string): object {
-        try {
-            return jwt.verify(token, this.secret) as object;
-        } catch (error) {
-            throw new Error('Invalid token');
+  generateToken(payload: object): string {
+    const SECRET_KEY: any = process.env.SECRET_KEY;
+
+    return jwt.sign({ payload }, SECRET_KEY, {
+      expiresIn: 60 * 60 * 24,
+    });
+  }
+
+  verifyToken(token: string): boolean {
+    try {
+      const SECRET_KEY: any = process.env.SECRET_KEY;
+
+      const result = jwt.verify(token, SECRET_KEY, (err: any) => {
+        if (err) {
+          return false;
         }
+        return true;
+      });
+      return false;
+    } catch (error) {
+      throw new Error("Invalid token");
     }
+  }
 }
 
 export default VerificationService;
