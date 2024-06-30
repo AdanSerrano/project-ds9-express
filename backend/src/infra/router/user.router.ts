@@ -26,7 +26,7 @@ const UserRouter = (app: Router): Router => {
         userRole
       );
 
-      if(resp) {
+      if (resp) {
         res.status(201).json({
           errorMessages: false,
           message: "User registered successfully",
@@ -43,11 +43,138 @@ const UserRouter = (app: Router): Router => {
           message: "User already exists",
         });
       }
-
     } catch (error: unknown) {
       res.status(500).json({ message: "Internal server error." });
     }
   });
+
+  router.get("/", verifyTokenMiddleware, async (req, res) => {
+    try {
+      const users = await userController.findAllUsers();
+
+      res.status(200).json({
+        errorMessages: false,
+        data: {
+          users: users.map((user: any) => {
+            return {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
+            };
+          }),
+        }
+      });
+    } catch (error: unknown) {
+      res.status(500).json({ message: "Internal server error." });
+    }
+  });
+
+  router.get("/:email", verifyTokenMiddleware, async (req, res) => {
+    try {
+      const email = req.params.email;
+
+      const user = await userService.findUnique(email);
+
+      if (user) {
+        res.status(200).json({
+          errorMessages: false,
+          data: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          },
+        });
+      } else {
+        res.status(400).json({
+          errorMessages: true,
+          message: "User not found",
+        });
+      }
+    } catch (error: unknown) {
+      res.status(500).json({ message: "Internal server error." });
+    }
+  });
+
+  router.put("/", verifyTokenMiddleware, async (req, res) => {
+    try {
+      const { email, name, role } = req.body;
+      const userRole = role ? role : "USER";
+
+      const resp = await userController.updateUser(email, name, userRole);
+
+      if (resp) {
+        res.status(200).json({
+          errorMessages: false,
+          message: "User updated successfully",
+          data: {
+            id: resp.id,
+            name: resp.name,
+            email: resp.email,
+            role: resp.role,
+          },
+        });
+      } else {
+        res.status(400).json({
+          errorMessages: true,
+          message: "User not found",
+        });
+      }
+    } catch (error: unknown) {
+      res.status(500).json({ message: "Internal server error." });
+    }
+  });
+
+  router.put("/changePassword", verifyTokenMiddleware, async (req, res) => {
+    try {
+      const { email, passwordOld, newPassword } = req.body;
+
+      const resp = await userController.changePassword(
+        email,
+        passwordOld,
+        newPassword
+      );
+
+      if (resp) {
+        res.status(200).json({
+          errorMessages: false,
+          message: "Password changed successfully",
+        });
+      } else {
+        res.status(400).json({
+          errorMessages: true,
+          message: "User not found or password is incorrect",
+        });
+      }
+    } catch (error: unknown) {
+      res.status(500).json({ message: "Internal server error." });
+    }
+  });
+
+  router.delete("/:email", verifyTokenMiddleware, async (req, res) => {
+    try {
+      const email = req.params.email;
+
+      const resp = await userController.deleteUser(email);
+
+      if (resp) {
+        res.status(200).json({
+          errorMessages: false,
+          message: "User deleted successfully",
+        });
+      } else {
+        res.status(400).json({
+          errorMessages: true,
+          message: "User not found",
+        });
+      }
+    } catch (error: unknown) {
+      res.status(500).json({ message: "Internal server error." });
+    }
+  });
+
+  
 
   return router;
 };
