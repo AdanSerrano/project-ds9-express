@@ -1,5 +1,5 @@
-'use client'
-import React, { useContext, useState, useTransition } from "react";
+'use client';
+import React, { useState, useTransition } from "react";
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Button } from '@/components/ui/button';
@@ -35,17 +35,22 @@ export const LoginForm = () => {
         setSuccess('');
         startTransition(async () => {
             try {
-                const response = await axios.post(`${apiUrl}/api/login`, values);
+                const response = await axios.post(`${apiUrl}/api/auth/login`, values);
                 if (response.data.success) {
+                    sessionStorage.setItem('token', response.data.token);
+                    sessionStorage.setItem('User', JSON.stringify(response.data.userInfo));
+                    router.push('/');
                     setSuccess(response.data.success);
                     toast.success(response.data.success);
-                    router.push('/dashboard');
+                } else {
+                    setError(response.data.error);
+                    toast.error(response.data.error);
                 }
             } catch (error: unknown) {
                 if (axios.isAxiosError(error)) {
                     if (error.response) {
-                        setError(error.response.data.error);
-                        toast.error(error.response.data.error);
+                        setError(error.response.data.message);
+                        toast.error(error.response.data.message);
                     } else {
                         setError('An unexpected error occurred');
                     }

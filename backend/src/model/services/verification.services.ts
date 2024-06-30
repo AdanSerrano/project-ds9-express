@@ -6,7 +6,7 @@ class VerificationService {
   private secret: string;
 
   constructor() {
-    this.secret = "default_secret"; // Default value for secret
+    this.secret = process.env.JWT_SECRET || "default_secret"; // Default value for secret
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -22,26 +22,16 @@ class VerificationService {
   }
 
   generateToken(payload: object): string {
-    const SECRET_KEY: any = process.env.SECRET_KEY;
-
-    return jwt.sign({ payload }, SECRET_KEY, {
+    return jwt.sign(payload, this.secret, {
       expiresIn: 60 * 60 * 24,
     });
   }
 
-  verifyToken(token: string): boolean {
+  verifyToken(token: string): object {
     try {
-      const SECRET_KEY: any = process.env.SECRET_KEY;
-
-      const result = jwt.verify(token, SECRET_KEY, (err: any) => {
-        if (err) {
-          return false;
-        }
-        return true;
-      });
-      return false;
+      return jwt.verify(token, this.secret) as object;
     } catch (error) {
-      throw new Error("Invalid token");
+      throw new Error('Invalid token');
     }
   }
 }

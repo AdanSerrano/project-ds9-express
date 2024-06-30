@@ -1,7 +1,16 @@
+'use client'
 import { SpotlightFound } from '@/components/SpotlightFound'
-import React from 'react'
+import { isLoggedIn } from '@/lib/verificationToken';
+import { useRouter } from 'next/navigation';
+import React, { useEffect } from 'react'
 
-export default function layout({ children }: { children: React.ReactNode }) {
+export default function LayoutAuthentication({ children }: { children: React.ReactNode }) {
+    const router = useRouter()
+    useEffect(() => {
+        if (isLoggedIn()) {
+            router.push('/');
+        }
+    }, [router]);
     return (
         <SpotlightFound>
             <div className='flex items-center justify-center h-full w-full min-h-screen relative z-10'>{children}</div>

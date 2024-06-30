@@ -1,3 +1,12 @@
+type LoginResult = {
+  accessToken: string;
+  userInfo: {
+    name: string;
+    email: string;
+    id: string;
+  };
+};
+
 class AuthController {
   private authService: any;
   private verificationService: any;
@@ -7,7 +16,7 @@ class AuthController {
     this.verificationService = verificationService;
   }
 
-  async login(email: string, password: string): Promise<string> {
+  async login(email: string, password: string): Promise<LoginResult> {
     if (!email.trim() || !password.trim()) {
       throw new Error("Email and password are required.");
     }
@@ -34,8 +43,17 @@ class AuthController {
         id: existingUser.id,
       },
     });
+    const userInfo = {
+      name: existingUser.name,
+      email: existingUser.email,
+      id: existingUser.id,
 
-    return accessToken;
+    };
+
+    return {
+      accessToken,
+      userInfo: userInfo,
+    }
   }
 }
 
