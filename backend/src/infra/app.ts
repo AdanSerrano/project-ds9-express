@@ -3,7 +3,6 @@ import cookieParser from 'cookie-parser';
 import { app_router } from './router';
 
 const app = express();
-
 app.use(express.json());
 app.use(cookieParser());
 
