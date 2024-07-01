@@ -63,7 +63,7 @@ const UserRouter = (app: Router): Router => {
               role: user.role,
             };
           }),
-        }
+        },
       });
     } catch (error: unknown) {
       res.status(500).json({ message: "Internal server error." });
@@ -173,8 +173,6 @@ const UserRouter = (app: Router): Router => {
       res.status(500).json({ message: "Internal server error." });
     }
   });
-
-  
 
   return router;
 };
