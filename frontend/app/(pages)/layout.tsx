@@ -15,8 +15,6 @@ export default function PageLayout({
   useEffect(() => {
     if (!isLoggedIn()) {
       router.push('/auth/login');
-    } else {
-      router.push('/');
     }
   }, [router]);
 

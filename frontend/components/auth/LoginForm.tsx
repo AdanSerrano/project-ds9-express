@@ -39,9 +39,9 @@ export const LoginForm = () => {
                 if (response.data.success) {
                     sessionStorage.setItem('token', response.data.token);
                     sessionStorage.setItem('User', JSON.stringify(response.data.userInfo));
-                    router.push('/sales');
                     setSuccess(response.data.success);
                     toast.success(response.data.success);
+                    router.push('/sales');
                 } else {
                     setError(response.data.error);
                     toast.error(response.data.error);
