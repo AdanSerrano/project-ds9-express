@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { isLoggedIn } from "@/lib/verificationToken";
 import { useEffect } from "react";
 import { navItems } from "@/data";
+import { NabarComponent } from "@/components/Nabar";
 
 export default function PageLayout({
   children,
@@ -20,7 +21,7 @@ export default function PageLayout({
 
   return (
     <div className="w-screen overflow-hidden flex items-center flex-col">
-      <FloatingNav navItems={navItems} />
+      <NabarComponent />
       {children}
       <Footer />
     </div>

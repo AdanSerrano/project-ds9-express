@@ -2,6 +2,7 @@
 import { FloatingNav } from "@/components/ui/FloatingNavbar";
 import { Footer } from "@/components/Footer";
 import { navItems } from "@/data";
+import { NabarComponent } from "@/components/Nabar";
 
 export default function PageLayout({
   children,
@@ -10,7 +11,7 @@ export default function PageLayout({
 }>) {
   return (
     <div className="w-screen overflow-hidden flex items-center flex-col">
-      <FloatingNav navItems={navItems} />
+      <NabarComponent />
       {children}
       <Footer />
     </div>

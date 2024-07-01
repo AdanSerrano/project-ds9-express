@@ -1,3 +1,5 @@
+import { User } from "@/interface";
+
 export const isLoggedIn = () => {
     const token = sessionStorage.getItem('token');
     return !!token;
@@ -7,4 +9,9 @@ export const isLoggedIn = () => {
 export const LogoutClick = () => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('User');
+}
+
+export const currentUser = (): User | null => {
+    const user = sessionStorage.getItem('User');
+    return user ? JSON.parse(user) : null;
 }
