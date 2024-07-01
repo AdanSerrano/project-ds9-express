@@ -39,7 +39,7 @@ export const LoginForm = () => {
                 if (response.data.success) {
                     sessionStorage.setItem('token', response.data.token);
                     sessionStorage.setItem('User', JSON.stringify(response.data.userInfo));
-                    router.push('/');
+                    router.push('/sales');
                     setSuccess(response.data.success);
                     toast.success(response.data.success);
                 } else {
