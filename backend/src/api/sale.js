@@ -2,13 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
+ 
 router.get('/', async (req, res) => {
     try {
         const sales = await prisma.sale.findMany({
             include: {
                 details: true,
-                clients: true
+                client: true  
             }
         });
         res.status(200).json(sales);
@@ -16,21 +16,17 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
+ 
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const sale = await prisma.sale.findUnique({
             where: {
-                id
+                id: id
             },
             include: {
-                clients: {
-                    select: {
-                        name: true,
-                    }
-                },
                 details: true,
+                client: true  
             }
         });
         if (!sale) {
@@ -41,40 +37,33 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
+ 
 router.post('/', async (req, res) => {
     const { clientId, saleDate, details } = req.body;
-
+ 
     try {
         const sale = await prisma.sale.create({
             data: {
                 clientId,
-                saleDate,
+                saleDate: new Date(saleDate),
                 details: {
-                    create: details.map(detail => ({
-                        ...detail,
-                        quantity: Number(detail.quantity),
-                        price: Number(detail.price),
-                        total: Number(detail.total)
-                    }))
+                    create: details
                 }
             },
             include: {
                 details: true
             }
         });
-
         res.status(201).json({ sale, success: 'Venta creada satisfactoriamente' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-
-
+ 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { clientId, saleDate, details } = req.body;
-
+    const { clientId, saleDate } = req.body;
+ 
     try {
         const updatedSale = await prisma.sale.update({
             where: {
@@ -83,38 +72,21 @@ router.put('/:id', async (req, res) => {
             data: {
                 clientId,
                 saleDate: new Date(saleDate)
+            },
+            include: {
+                details: true
             }
         });
-
-        const updatedDetails = await Promise.all(details.map(async (detail) => {
-            return await prisma.saleDetail.upsert({
-                where: {
-                    id: detail.id || '',
-                },
-                update: {
-                    product: detail.product,
-                    quantity: detail.quantity,
-                    price: detail.price,
-                },
-                create: {
-                    saleId: id,
-                    product: detail.product,
-                    quantity: detail.quantity,
-                    price: detail.price,
-                }
-            });
-        }));
-
-        res.status(200).json({ ...updatedSale, details: updatedDetails });
+ 
+        res.status(200).json(updatedSale);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-
-
+ 
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
-
+ 
     try {
         const sale = await prisma.sale.delete({
             where: {
@@ -126,8 +98,8 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
-
+ 
+ 
 router.get('/:saleId/details', async (req, res) => {
     const { saleId } = req.params;
     try {
@@ -141,7 +113,7 @@ router.get('/:saleId/details', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
+ 
 router.get('/:saleId/details/:id', async (req, res) => {
     const { saleId, id } = req.params;
     try {
@@ -158,12 +130,12 @@ router.get('/:saleId/details/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
+ 
 router.post('/:saleId/details', async (req, res) => {
     const { saleId } = req.params;
     const { product, quantity, price } = req.body;
     const total = quantity * price;
-
+ 
     try {
         const detail = await prisma.saleDetail.create({
             data: {
@@ -179,12 +151,12 @@ router.post('/:saleId/details', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
+ 
 router.put('/:saleId/details/:id', async (req, res) => {
     const { id } = req.params;
     const { product, quantity, price } = req.body;
     const total = quantity * price;
-
+ 
     try {
         const updatedDetail = await prisma.saleDetail.update({
             where: {
@@ -197,16 +169,16 @@ router.put('/:saleId/details/:id', async (req, res) => {
                 total
             }
         });
-
+ 
         res.status(200).json(updatedDetail);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-
+ 
 router.delete('/:saleId/details/:id', async (req, res) => {
     const { id } = req.params;
-
+ 
     try {
         const detail = await prisma.saleDetail.delete({
             where: {
@@ -218,5 +190,5 @@ router.delete('/:saleId/details/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
+ 
 module.exports = router;

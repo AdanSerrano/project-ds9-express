@@ -25,48 +25,12 @@ router.post("/", async (req, res) => {
       return res.status(401).json({ error: "Usuario o contraseña incorrecta" });
     }
 
-    const token = jwt.sign({
-      "userInfo": {
-        name: existingUser.name,
-        email: existingUser.email,
-      }
-    }
-      , process.env.JWT_SECRET || 'secret', {
+    const token = jwt.sign({ id: existingUser.id }, process.env.JWT_SECRET || 'secret', {
       expiresIn: 60 * 60 * 24
     });
-    console.log(token)
 
-    const refreshToken = jwt.sign({
-      "email": {
-        email: existingUser.email,
-      }
-    }
-      , process.env.JWT_SECRET
-      , {
-        expiresIn: 60 * 60 * 24 * 30
-      });
-
-    const updateUser = await prisma.user.update({
-      where: {
-        email: email
-      },
-      data: {
-        accessToken: refreshToken
-      }
-    });
-
-
-    res.cookie('jwt', token, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      sameSite: 'None',
-      secure: true
-    })
-
-
-    return res.status(200).json({
-      user: updateUser, token, success: "Login exitoso"
-    });
+    const user = existingUser;
+    return res.status(200).json({ user, token, success: "Login exitoso" });
   } catch (error) {
     console.log("Error in /login/");
     console.error(error);
