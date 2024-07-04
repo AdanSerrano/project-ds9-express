@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -15,6 +15,16 @@ const poppins = Montserrat({
   subsets: ["latin"],
   variable: '--font-poppins',
 });
+
+export const viewport: Viewport = {
+  themeColor: '#ffffff',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  minimumScale: 0
+}
+
 
 export const metadata: Metadata = {
   title: "Create Next App",

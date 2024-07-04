@@ -60,6 +60,7 @@ export const RegisterForm = () => {
                 if (axios.isAxiosError(error)) {
                     if (error.response) {
                         setError(error.response.data.error);
+                        toast.error(error.response.data.error);
                     } else {
                         setError('An unexpected error occurred');
                     }

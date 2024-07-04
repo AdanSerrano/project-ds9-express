@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     motion,
     AnimatePresence,
@@ -8,6 +8,9 @@ import {
 } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { isLoggedIn, LogoutClick } from "@/lib/verificationToken";
+import { Button } from "./button";
+import { useRouter } from "next/navigation";
 
 export const FloatingNav = ({
     navItems,
@@ -23,6 +26,21 @@ export const FloatingNav = ({
     const { scrollYProgress } = useScroll();
 
     const [visible, setVisible] = useState(false);
+
+    const [loggedIn, setLoggedIn] = useState(false);
+    const router = useRouter()
+
+    useEffect(() => {
+        setLoggedIn(isLoggedIn());
+    }, []);
+
+    const [logout, setLogout] = useState(false);
+
+    const handleLogoutClick = () => {
+        LogoutClick();
+        setLoggedIn(false);
+        router.refresh()
+    };
 
     useMotionValueEvent(scrollYProgress, "change", (current) => {
         // Check if current is not undefined and is a number
@@ -42,7 +60,7 @@ export const FloatingNav = ({
     });
 
     return (
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" >
             <motion.div
                 initial={{
                     opacity: 1,
@@ -56,7 +74,7 @@ export const FloatingNav = ({
                     duration: 0.2,
                 }}
                 className={cn(
-                    "flex max-w-fit  fixed top-10 inset-x-0 mx-auto border border-white/[0.2] rounded-full bg-black shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-[5000] pr-2 pl-8 py-2  items-center justify-center space-x-4",
+                    "flex max-w-fit  w-full fixed top-10 inset-x-0 mx-auto border border-white/[0.2] rounded-full bg-black shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-[5000] pr-2 pl-8 py-2  items-center justify-center space-x-4",
                     className
                 )}
             >
@@ -72,13 +90,20 @@ export const FloatingNav = ({
                         <span className="hidden sm:block text-sm">{navItem.name}</span>
                     </Link>
                 ))}
-                <button className="border text-sm font-medium relative border-neutral-200 border-white/[0.2]  text-white px-4 py-2 rounded-full">
-                    <Link href={'/auth/login'}>
-                        <span>Login</span>
-                    </Link>
-                    <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent  h-px" />
-                </button>
+                {loggedIn ? (
+                    <Button onClick={handleLogoutClick} variant="ghost" className="border text-sm font-medium relative border-neutral-200 border-white/[0.2] text-white px-4 py-2 rounded-full">
+                        Logout
+                        <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent h-px" />
+                    </Button>
+                ) : (
+                    <Button variant="ghost" className="border text-sm font-medium relative border-neutral-200 border-white/[0.2] text-white px-4 py-2 rounded-full">
+                        <Link href="/auth/login">
+                            Login
+                        </Link>
+                        <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent h-px" />
+                    </Button>
+                )}
             </motion.div>
-        </AnimatePresence>
+        </AnimatePresence >
     );
 };
