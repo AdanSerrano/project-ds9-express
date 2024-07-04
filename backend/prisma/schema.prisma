@@ -9,8 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider     = "mongodb"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 enum Role {
@@ -20,45 +21,48 @@ enum Role {
 
 //User Model 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  email     String?  @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String?  @unique
+  password    String
+  accessToken String?
+  role        Role     @default(USER)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Client {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   lastname    String
   phoneNumber String
   createdDate DateTime @default(now())
   updatedDate DateTime @updatedAt
-
-  sales       Sale[]
+  sales       Sale[]   @relation("ClientToSale")
 }
 
 model Sale {
-  id          String         @id @default(auto()) @map("_id") @db.ObjectId
-  clientId    String
-  client      Client      @relation(fields: [clientId], references: [id])
-  saleDate    DateTime    @default(now())
-  createdDate DateTime    @default(now())
-  updatedDate DateTime    @updatedAt
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  saleDate    DateTime     @default(now())
+  createdDate DateTime     @default(now())
+  updatedDate DateTime     @updatedAt
+  clientId    String       @db.ObjectId
+  clients     Client       @relation("ClientToSale", fields: [clientId], references: [id], onDelete: Cascade)
+  details     SaleDetail[] @relation("SaleToSaleDetail")
 
-  details     SaleDetail[]
+  @@index([clientId])
 }
 
 model SaleDetail {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  saleId      String
-  sale        Sale        @relation(fields: [saleId], references: [id])
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   product     String
   quantity    Int
   price       Float
   total       Float
   createdDate DateTime @default(now())
   updatedDate DateTime @updatedAt
+  saleId      String   @db.ObjectId
+  sales       Sale     @relation("SaleToSaleDetail", fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
 }
