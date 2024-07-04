@@ -1,9 +1,12 @@
+import { Role } from "@prisma/client";
+
 type LoginResult = {
   accessToken: string;
   userInfo: {
     name: string;
     email: string;
     id: string;
+    role: Role;
   };
 };
 
@@ -41,13 +44,14 @@ class AuthController {
         name: existingUser.name,
         email: existingUser.email,
         id: existingUser.id,
+        role: existingUser.role
       },
     });
     const userInfo = {
       name: existingUser.name,
       email: existingUser.email,
       id: existingUser.id,
-
+      role: existingUser.role
     };
 
     return {

@@ -19,7 +19,7 @@ export default function Home() {
         <Hero />
         <Grid />
         <div className="bg-white absolute top-10">
-          <p>Welcome, {user?.id}!</p>
+          <p>Welcome, {user?.role}!</p>
         </div>
       </div>
     </main>

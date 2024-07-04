@@ -15,3 +15,7 @@ export const currentUser = (): User | null => {
     const user = sessionStorage.getItem('User');
     return user ? JSON.parse(user) : null;
 }
+
+export const verificationToken = (token: string) => {
+    sessionStorage.setItem('token', token);
+}

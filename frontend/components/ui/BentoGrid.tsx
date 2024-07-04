@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { BackgroundGradientAnimation } from "./BackgroundGradientAnimation";
+import Image from "next/image";
 
 export const BentoGrid = ({
     className,
@@ -11,7 +12,8 @@ export const BentoGrid = ({
     return (
         <div
             className={cn(
-                "grid grid-cols-1 md:grid-cols-5 gap-4 gridwo md:gap-8 mx-auto",
+                // change gap-4 to gap-8, change grid-cols-3 to grid-cols-5, remove md:auto-rows-[18rem], add responsive code
+                "grid grid-cols-1 md:grid-cols-6 lg:grid-cols-5 md:grid-row-2 gap-4 lg:gap-8 mx-auto",
                 className
             )}
         >
@@ -53,19 +55,21 @@ export const BentoGridItem = ({
             <div className={`${id === 6 && "flex justify-center"} h-full`}>
                 <div className="absolute">
                     {img && (
-                        <img
+                        <Image
                             src={img}
                             alt={img}
                             className={cn(imgClassName, "object-cover object-center")}
+                            fill
                         />
                     )}
                 </div>
                 <div className={`absolute -right-20 -bottom-5 ${id === 4 && 'w-full opacity-80'}`}>
                     {spareImg && (
-                        <img
+                        <Image
                             src={spareImg}
                             alt={spareImg}
                             className={"object-cover object-center w-full h-full"}
+                            fill
                         />
                     )}
                 </div>

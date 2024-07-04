@@ -4,6 +4,7 @@ import VerificationService from "../../model/services/verification.services";
 import UserModel from "../../model/user.model";
 import DatabaseService from "../../model/services/database.services";
 import UserController from "../../controller/user.controller";
+import { Role } from "@prisma/client";
 
 const UserRouter = (app: Router): Router => {
   const router = Router();
@@ -13,11 +14,11 @@ const UserRouter = (app: Router): Router => {
   const verificationService = new VerificationService();
   const userController = new UserController(userService, verificationService);
 
-  router.post("/", verifyTokenMiddleware, async (req, res) => {
+  router.post("/", async (req, res) => {
     try {
       const { name, email, password, role } = req.body;
 
-      const userRole = role ? role : "USER";
+      const userRole = role ? role : Role.USER;
 
       const resp = await userController.register(
         name,
@@ -29,7 +30,7 @@ const UserRouter = (app: Router): Router => {
       if (resp) {
         res.status(201).json({
           errorMessages: false,
-          message: "User registered successfully",
+          success: "Usuario registrado exitosamente",
           data: {
             id: resp.id,
             name: resp.name,
@@ -40,11 +41,11 @@ const UserRouter = (app: Router): Router => {
       } else {
         res.status(400).json({
           errorMessages: true,
-          message: "User already exists",
+          error: "Este usuario ya existe",
         });
       }
     } catch (error: unknown) {
-      res.status(500).json({ message: "Internal server error." });
+      res.status(500).json({ error: "Internal server error." });
     }
   });
 
@@ -174,7 +175,7 @@ const UserRouter = (app: Router): Router => {
     }
   });
 
-  
+
 
   return router;
 };

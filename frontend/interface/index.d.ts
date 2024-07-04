@@ -2,6 +2,7 @@ export interface User {
     id?: string;
     name?: string;
     email?: string;
+    role?: string;
 }
 
 export interface Client {
@@ -9,6 +10,9 @@ export interface Client {
     name?: string;
     lastname?: string;
     phoneNumber?: string;
+    ident?: string
+    createdAt?: Date | ReactNode;
+    sales?: Sale[];
 }
 
 export interface Sale {
