@@ -6,7 +6,7 @@ class VerificationService {
   private secret: string;
 
   constructor() {
-    this.secret = process.env.JWT_SECRET || "default_secret"; // Default value for secret
+    this.secret = process.env.JWT_SECRET || "default_secret"; 
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -31,6 +31,7 @@ class VerificationService {
     try {
       return jwt.verify(token, this.secret) as object;
     } catch (error) {
+      console.error("Error verifyToken: ", error);
       throw new Error('Invalid token');
     }
   }

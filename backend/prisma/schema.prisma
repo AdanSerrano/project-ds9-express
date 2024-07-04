@@ -38,6 +38,7 @@ model Client {
   phoneNumber String
   createdDate DateTime @default(now())
   updatedDate DateTime @updatedAt
+  ident       String
   sales       Sale[]   @relation("ClientToSale")
 }
 

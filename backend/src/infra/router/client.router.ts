@@ -28,5 +28,40 @@ export const ClientRouter = (expressInstance: express.Router): express.Router =>
         }
     });
 
+    expressInstance.post('/', verifyTokenMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const service = new ClientModel(DatabaseService.getInstance());
+            const controller = new ClientController(service);
+            const client = await controller.createClient(req.body);
+            res.status(201).json(client);
+        } catch (error) {
+            next(error); // Pass the error to the error-handling middleware
+        }
+    });
+
+    expressInstance.put('/:id', verifyTokenMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+        try {
+            const service = new ClientModel(DatabaseService.getInstance());
+            const controller = new ClientController(service);
+            const client = await controller.updateClient(id, req.body);
+            res.status(200).json(client);
+        } catch (error) {
+            next(error); // Pass the error to the error-handling middleware
+        }
+    });
+
+    expressInstance.delete('/:id', verifyTokenMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+        try {
+            const service = new ClientModel(DatabaseService.getInstance());
+            const controller = new ClientController(service);
+            const client = await controller.deleteClient(id);
+            res.status(200).json(client);
+        } catch (error) {
+            next(error); // Pass the error to the error-handling middleware
+        }
+    });
+
     return expressInstance;
 };
