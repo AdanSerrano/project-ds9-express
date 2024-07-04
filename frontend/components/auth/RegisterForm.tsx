@@ -13,15 +13,19 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FormError } from '@/components/auth/FormError'
-import { FormSuccess } from '@/components/auth/FormSuccess'
+import { FormError } from '@/app/_components/FormError'
+import { FormSuccess } from '@/app/_components/FormSuccess'
 import { RegisterSchema } from '@/schema'
 import axios from 'axios'
 import { PasswordInput } from '../ui/input-password'
 import { apiUrl } from '@/lib/api-url'
 import { useRouter } from 'next/navigation'
-import { User } from '@/interface'
 
+interface User {
+    id?: string;
+    name?: string;
+    email?: string;
+}
 
 export const RegisterForm = () => {
     const [isPending, startTransition] = useTransition()
@@ -47,7 +51,7 @@ export const RegisterForm = () => {
         setSuccess('');
         startTransition(async () => {
             try {
-                const response = await axios.post(`${apiUrl}/api/users`, values);
+                const response = await axios.post(`${apiUrl}/users`, values);
                 setUsers([...users, response.data]);
                 setNewUser(response.data);
                 if (response.data.success) {
@@ -60,7 +64,6 @@ export const RegisterForm = () => {
                 if (axios.isAxiosError(error)) {
                     if (error.response) {
                         setError(error.response.data.error);
-                        toast.error(error.response.data.error);
                     } else {
                         setError('An unexpected error occurred');
                     }

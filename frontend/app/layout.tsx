@@ -1,12 +1,10 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Spotlight } from "@/components/ui/spotlight";
-import { FloatingNav } from "@/components/ui/FloatingNavbar";
-import { navItems } from "@/data";
-import { Footer } from "@/components/Footer";
+import { ContextProvider } from "@/context/context-provider";
 
 
 const poppins = Montserrat({
@@ -15,16 +13,6 @@ const poppins = Montserrat({
   subsets: ["latin"],
   variable: '--font-poppins',
 });
-
-export const viewport: Viewport = {
-  themeColor: '#ffffff',
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  minimumScale: 0
-}
-
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -37,18 +25,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.className} bg-black-100`} suppressHydrationWarning>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster />
-        </ThemeProvider>
-      </body>
-    </html >
+    <ContextProvider>
+      <html lang="en">
+        <body className={poppins.className} suppressHydrationWarning={true}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="relative overflow-hidden flex items-center justify-center w-full min-h-screen h-full">
+              <div className="pb-20 pt-36">
+                <Spotlight className="-top-40 -left-10 md:-left-32 md:-top-20 h-screen" fill="white" />
+                <Spotlight className="-top-10 left-40 h-[80vh] w-[50vw]" fill="blue" />
+                <Spotlight className="-top-28 left-80 h-[80vh] w-[50vw]" fill="purple" />
+              </div>
+              <div className="h-screen w-full bg-black-100 bg-grid-white/[0.03] flex items-center justify-center absolute top-0 left-0">
+                <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-black-100 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+              </div>
+              <div className="relative z-10">
+                {children}
+              </div>
+            </div>
+            <Toaster />
+          </ThemeProvider>
+        </body>
+      </html>
+    </ContextProvider>
   );
 }
