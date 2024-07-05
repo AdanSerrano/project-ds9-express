@@ -18,6 +18,10 @@ class SalesController {
   async getOneSales(id: string) {
     return await this.salesService.findUniqueSales(id);
   }
+
+  async deleteSales(id: string) {
+    return await this.salesService.deleteSales(id);
+  }
 }
 
 export default SalesController;

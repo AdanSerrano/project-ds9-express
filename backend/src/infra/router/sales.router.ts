@@ -119,7 +119,7 @@ const SaleRouter = (app: Router): Router => {
     }
   });
 
-  /* router.delete("/:id", verifyTokenMiddleware, async (req, res) => {
+  router.delete("/:id", verifyTokenMiddleware, async (req, res) => {
     try {
       const { id } = req.params;
       const sale = await saleController.deleteSales(id);
@@ -128,15 +128,38 @@ const SaleRouter = (app: Router): Router => {
         errorMessages: false,
         success: "Venta eliminada exitosamente",
         data: {
-          id: sale.id,
-          clientId: sale.clientId,
-          saleDate: sale.saleDate,
-        },
+            id: sale.id,
+            saleDate: sale.saleDate,
+            clients: {
+              id: sale.clients.id,
+              name: sale.clients.name,
+              lastname: sale.clients.lastname,
+              phoneNumber: sale.clients.phoneNumber,
+              ident: sale.clients.ident,
+            },
+            details: sale.details.map((detail: any) => {
+              var price_value = detail.quantity * (detail.price - detail.discount) 
+              var tax_value = price_value * detail.tax
+              var total_value = price_value + tax_value
+  
+              return {
+                id: detail.id,
+                quantity: detail.quantity,
+                product: detail.product,
+                price: detail.price,
+                tax: detail.tax,
+                discount: parseFloat(detail.discount.toFixed(2)),
+                price_total: parseFloat(price_value.toFixed(2)),
+                tax_total: parseFloat(tax_value.toFixed(2)),
+                total: parseFloat(total_value.toFixed(2)),
+              };
+            }),
+          },
       });
     } catch (error: unknown) {
       res.status(500).json({ error: "Internal server error." });
     }
-  });*/
+  });
 
   return router;
 };

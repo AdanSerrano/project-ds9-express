@@ -82,11 +82,34 @@ class SalesModel {
   // }
 
   async deleteSales(id: string): Promise<any> {
-    return await this.database.sale.delete({
+
+    const sale = await this.findUniqueSales(id);
+
+    if (!sale) {
+      return null;
+    }
+
+    await this.database.saleDetail.deleteMany({
+      where: {
+        saleId: id,
+      },
+    });
+
+    await this.database.sale.delete({
       where: {
         id: id,
       },
     });
+
+    return sale;
+
+
+/*
+    return await this.database.sale.delete({
+      where: {
+        id: id,
+      },
+    });*/
   }
 }
 
