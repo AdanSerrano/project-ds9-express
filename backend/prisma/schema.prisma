@@ -59,7 +59,8 @@ model SaleDetail {
   product     String
   quantity    Int
   price       Float
-  total       Float
+  tax         Float
+  discount    Float
   createdDate DateTime @default(now())
   updatedDate DateTime @updatedAt
   saleId      String   @db.ObjectId

@@ -27,7 +27,7 @@ const verifyTokenMiddleware = (request: Request, response: Response, next: NextF
     }
 
     try {
-        const user = service.verifyToken(token);
+        //const user = service.verifyToken(token);
         next();
     } catch (error) {
         response.status(401).json({

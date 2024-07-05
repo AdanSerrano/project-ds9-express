@@ -2,7 +2,7 @@ import { Router } from 'express';
 import AuthRouter from './auth.router';
 import { ClientRouter } from './client.router';
 import UserRouter from './user.router';
-import { SalesRouter } from './sales.router';
+import SalesRouter from './sales.router';
 export const app_router = (app: Router) => [
     {
         path: '/api/auth',

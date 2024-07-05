@@ -1,13 +1,14 @@
 class SalesController {
   private salesService: any;
+  private verificationService: any;
 
-  constructor(salesService: any) {
+  constructor(salesService: any, verificationService: any) {
     this.salesService = salesService;
   }
 
 
-  async createSales(inputData: any) {
-    return await this.salesService.createSales(inputData);
+  async createSales(clientId: any, saleDate: any, details: any) {
+    return await this.salesService.createSales(clientId, saleDate, details);
   }
 
   async findAllSales() {
