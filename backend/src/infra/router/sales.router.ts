@@ -5,6 +5,7 @@ import SaleModel from "../../model/sales.model";
 import DatabaseService from "../../model/services/database.services";
 import SalesController from "../../controller/sales.controller";
 import { Role } from "@prisma/client";
+import { Console } from "console";
 
 const SaleRouter = (app: Router): Router => {
   const router = Router();
@@ -18,36 +19,24 @@ const SaleRouter = (app: Router): Router => {
     try {
       const { clientId, saleDate, details } = req.body;
 
-      console.log({clientId, saleDate, details});
+      const sale = await saleController.createSales(
+        clientId,
+        saleDate,
+        details
+      );
 
-      const resp = await saleController.createSales(clientId, saleDate, details);
-
-      /*if (resp) {
+      if (sale) {
         res.status(201).json({
           errorMessages: false,
           success: "Venta registrada exitosamente",
-          data: {
-            id: resp.id,
-            clientId: resp.clientId,
-            saleDate: resp.saleDate,
-          },
+          data: saleFormat(sale),
         });
       } else {
         res.status(400).json({
           errorMessages: true,
           error: "Esta venta ya existe",
         });
-      }*/
-
-        res.status(201).json({
-            errorMessages: false,
-            success: "Venta registrada exitosamente",
-            data: {
-            id: 1,
-            clientId: 1,
-            saleDate: "2021-10-10",
-            },
-        });
+      }
     } catch (error: unknown) {
       res.status(500).json({ error: "Internal server error." });
     }
@@ -57,23 +46,14 @@ const SaleRouter = (app: Router): Router => {
     try {
       const sale = await saleController.findAllSales();
 
+      console.log();
+
       res.status(200).json({
         errorMessages: false,
-        data: sale.map((sale: any) => {
-          return {
-            id: sale.id,
-            saleDate: sale.saleDate,
-            clients: {
-              id: sale.clients.id,
-              name: sale.clients.name,
-              lastname: sale.clients.lastname,
-              phoneNumber: sale.clients.phoneNumber,
-              ident: sale.clients.ident,
-            },
-          };
-        }),
+        data: saleFormat(sale),
       });
     } catch (error: unknown) {
+      console.error(error);
       res.status(500).json({ error: "Internal server error." });
     }
   });
@@ -85,34 +65,7 @@ const SaleRouter = (app: Router): Router => {
 
       res.status(200).json({
         errorMessages: false,
-        data: {
-          id: sale.id,
-          saleDate: sale.saleDate,
-          clients: {
-            id: sale.clients.id,
-            name: sale.clients.name,
-            lastname: sale.clients.lastname,
-            phoneNumber: sale.clients.phoneNumber,
-            ident: sale.clients.ident,
-          },
-          details: sale.details.map((detail: any) => {
-            var price_value = detail.quantity * (detail.price - detail.discount) 
-            var tax_value = price_value * detail.tax
-            var total_value = price_value + tax_value
-
-            return {
-              id: detail.id,
-              quantity: detail.quantity,
-              product: detail.product,
-              price: detail.price,
-              tax: detail.tax,
-              discount: parseFloat(detail.discount.toFixed(2)),
-              price_total: parseFloat(price_value.toFixed(2)),
-              tax_total: parseFloat(tax_value.toFixed(2)),
-              total: parseFloat(total_value.toFixed(2)),
-            };
-          }),
-        },
+        data: saleFormat(sale),
       });
     } catch (error: unknown) {
       res.status(500).json({ error: "Internal server error." });
@@ -127,39 +80,161 @@ const SaleRouter = (app: Router): Router => {
       res.status(200).json({
         errorMessages: false,
         success: "Venta eliminada exitosamente",
-        data: {
-            id: sale.id,
-            saleDate: sale.saleDate,
-            clients: {
-              id: sale.clients.id,
-              name: sale.clients.name,
-              lastname: sale.clients.lastname,
-              phoneNumber: sale.clients.phoneNumber,
-              ident: sale.clients.ident,
-            },
-            details: sale.details.map((detail: any) => {
-              var price_value = detail.quantity * (detail.price - detail.discount) 
-              var tax_value = price_value * detail.tax
-              var total_value = price_value + tax_value
-  
-              return {
-                id: detail.id,
-                quantity: detail.quantity,
-                product: detail.product,
-                price: detail.price,
-                tax: detail.tax,
-                discount: parseFloat(detail.discount.toFixed(2)),
-                price_total: parseFloat(price_value.toFixed(2)),
-                tax_total: parseFloat(tax_value.toFixed(2)),
-                total: parseFloat(total_value.toFixed(2)),
-              };
-            }),
-          },
+        data: saleFormat(sale),
       });
     } catch (error: unknown) {
       res.status(500).json({ error: "Internal server error." });
     }
   });
+
+  router.delete("/details/:id", verifyTokenMiddleware, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const sale = await saleController.deleteSalesDetails(id);
+
+      res.status(200).json({
+        errorMessages: false,
+        success: "Detalle eliminado exitosamente",
+        data: saleFormat(sale),
+      });
+    } catch (error: unknown) {
+      res.status(500).json({ error: "Internal server error." });
+    }
+  });
+
+  router.put("/details/", verifyTokenMiddleware, async (req, res) => {
+    try {
+      const { details, id } = req.body;
+      const sale = await saleController.updateSalesDetails(id, details);
+
+      res.status(200).json({
+        errorMessages: false,
+        success: "Detalle actualizado exitosamente",
+        data: saleFormat(sale),
+      });
+    } catch (error: unknown) {
+      res.status(500).json({ error: "Internal server error." });
+    }
+  });
+
+  router.post("/details/", verifyTokenMiddleware, async (req, res) => {
+    try {
+      const { saleId, details } = req.body;
+      const sale = await saleController.createSalesDetails(saleId, details);
+
+      console.log(sale);
+
+      res.status(200).json({
+        errorMessages: false,
+        success: "Detalle registrado exitosamente",
+        data: saleFormat(sale),
+      });
+    } catch (error: unknown) {
+      res.status(500).json({ error: "Internal server error." });
+    }
+  });
+
+  router.get("/details/:id", verifyTokenMiddleware, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const sale = await saleController.findUniqueSalesDetails(id);
+
+      res.status(200).json({
+        errorMessages: false,
+        data: saleDetailsFormat(sale),
+      });
+    } catch (error: unknown) {
+      res.status(500).json({ error: "Internal server error." });
+    }
+  });
+
+  
+
+  function saleFormat(sale: any) {
+    if (!Array.isArray(sale)) {
+      return {
+        id: sale.id,
+        saleDate: sale.saleDate,
+        clients: {
+          id: sale.clients.id,
+          name: sale.clients.name,
+          lastname: sale.clients.lastname,
+          phoneNumber: sale.clients.phoneNumber,
+          ident: sale.clients.ident,
+        },
+        details: sale.details.map((detail: any) => {
+          var price_value = detail.quantity * (detail.price - detail.discount);
+          var tax_value = price_value * detail.tax;
+          var total_value = price_value + tax_value;
+
+          return {
+            id: detail.id,
+            quantity: detail.quantity,
+            product: detail.product,
+            price: detail.price,
+            tax: detail.tax,
+            discount: parseFloat(detail.discount.toFixed(2)),
+            price_total: parseFloat(price_value.toFixed(2)),
+            tax_total: parseFloat(tax_value.toFixed(2)),
+            total: parseFloat(total_value.toFixed(2)),
+          };
+        }),
+      };
+    } else {
+      return sale.map((sale: any) => {
+        return {
+          id: sale.id,
+          saleDate: sale.saleDate,
+          clients: {
+            id: sale.clients.id,
+            name: sale.clients.name,
+            lastname: sale.clients.lastname,
+            phoneNumber: sale.clients.phoneNumber,
+            ident: sale.clients.ident,
+          },
+          details: saleDetailsFormat(sale.details),
+        };
+      });
+    }
+  }
+
+  function saleDetailsFormat(sale: any) {
+    if (!Array.isArray(sale)) {
+      var price_value = sale.quantity * (sale.price - sale.discount);
+      var tax_value = price_value * sale.tax;
+      var total_value = price_value + tax_value;
+
+      return {
+        id: sale.id,
+        quantity: sale.quantity,
+        product: sale.product,
+        price: sale.price,
+        tax: sale.tax,
+        discount: parseFloat(sale.discount.toFixed(2)),
+        price_total: parseFloat(price_value.toFixed(2)),
+        tax_total: parseFloat(tax_value.toFixed(2)),
+        total: parseFloat(total_value.toFixed(2)),
+      };
+    } else {
+      return sale.map((sale: any) => {
+        var price_value = sale.quantity * (sale.price - sale.discount);
+        var tax_value = price_value * sale.tax;
+        var total_value = price_value + tax_value;
+
+        return {
+          id: sale.id,
+          quantity: sale.quantity,
+          product: sale.product,
+          price: sale.price,
+          tax: sale.tax,
+          discount: parseFloat(sale.discount.toFixed(2)),
+          price_total: parseFloat(price_value.toFixed(2)),
+          tax_total: parseFloat(tax_value.toFixed(2)),
+          total: parseFloat(total_value.toFixed(2)),
+        };
+      });
+    }
+  }
 
   return router;
 };

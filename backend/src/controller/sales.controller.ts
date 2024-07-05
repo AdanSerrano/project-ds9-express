@@ -22,6 +22,22 @@ class SalesController {
   async deleteSales(id: string) {
     return await this.salesService.deleteSales(id);
   }
+
+  async deleteSalesDetails(id: string) {
+    return await this.salesService.deleteSalesDetails(id);
+  }
+
+  async updateSalesDetails(id: string, data: any) {
+    return await this.salesService.updateSalesDetails(id, data);
+  }
+
+  async createSalesDetails(saleId: any, details: any) {
+    return await this.salesService.createSalesDetails(saleId, details);
+  }
+
+  async findUniqueSalesDetails(id: string) {
+    return await this.salesService.findUniqueSalesDetails(id);
+  }
 }
 
 export default SalesController;
