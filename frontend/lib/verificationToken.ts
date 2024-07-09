@@ -19,3 +19,5 @@ export const currentUser = (): User | null => {
 export const verificationToken = (token: string) => {
     sessionStorage.setItem('token', token);
 }
+
+export const token = sessionStorage.getItem('token');

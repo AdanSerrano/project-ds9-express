@@ -18,9 +18,6 @@ export default function Home() {
       <div className="max-w-7xl w-full">
         <Hero />
         <Grid />
-        <div className="bg-white absolute top-10">
-          <p>Welcome, {user?.role}!</p>
-        </div>
       </div>
     </main>
   );

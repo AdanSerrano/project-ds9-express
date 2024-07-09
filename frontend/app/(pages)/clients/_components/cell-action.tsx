@@ -2,7 +2,7 @@
 
 import { Check, Copy, Edit, MoreHorizontal, Trash } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 import { AlertModal } from "@/components/modals/alert-modal"
 import { Button } from "@/components/ui/button"
@@ -21,7 +21,6 @@ export const CellAction = ({ data }: CellActionProps) => {
     const [loading, setLoading] = useState(false)
     const [open, setOpen] = useState(false)
     const router = useRouter()
-    const params = useParams()
 
     const onCopy = (description: string) => {
         navigator.clipboard.writeText(description)
@@ -32,13 +31,20 @@ export const CellAction = ({ data }: CellActionProps) => {
         }, 3000);
     }
 
+    const token = sessionStorage.getItem('token')
+
     const onDelete = async () => {
         try {
             setLoading(true)
-            await axios.delete(`${apiUrl}/api/clients/${data.id}`)
-            router.push(`/clients`)
-            router.refresh()
+            const response = await axios.delete(`${apiUrl}/api/clients/${data.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
             toast.success("clients deleted successfully")
+            // router.refresh()
+            location.reload()
         } catch (error) {
             toast.error("Something went wrong")
         } finally {

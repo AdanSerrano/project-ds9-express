@@ -5,6 +5,7 @@ import { apiUrl } from "@/lib/api-url";
 import { Sale, User } from "@/interface";
 import { SaleForm } from "./_components/SaleForm";
 import { Spotlight } from "@/components/ui/spotlight";
+import { MaxWidthWrappper } from "@/components/MaxWidthWrapper";
 
 export default function SaleIdPage({ params }: { params: { saleId: string } }) {
     const [sale, setSale] = useState<Sale | null>(null)
@@ -26,10 +27,10 @@ export default function SaleIdPage({ params }: { params: { saleId: string } }) {
         fetchData()
     }, [params.saleId])
     return (
-        <div className='flex-col '>
+        <MaxWidthWrappper className='flex-col'>
             <div className='flex-1 space-y-4 p-8 pt-6'>
                 <SaleForm initialData={sale} />
             </div>
-        </div>
+        </MaxWidthWrappper>
     )
 }

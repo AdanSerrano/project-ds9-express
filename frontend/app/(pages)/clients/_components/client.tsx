@@ -30,12 +30,12 @@ export const ClientsClient = ({ data }: ClientsClientProps) => {
         <>
             <div className="flex items-center justify-between">
                 <Heading
-                    title={`Sales (${data.length})`}
-                    description="Manage Sale"
+                    title={`Clientes (${data.length})`}
+                    description="Manejo Cliente"
                 />
-                <Button onClick={() => router.push(`/sales/news`)}>
+                <Button onClick={() => router.push(`/clients/news`)}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Add New
+                    Agregar Nuevo
                 </Button>
             </div>
             <Separator />

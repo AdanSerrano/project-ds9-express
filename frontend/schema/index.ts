@@ -25,5 +25,13 @@ export const SaleSchema = z.object({
     ).min(1, "At least one product is required").max(10, "Maximum 10 products allowed"),
 });
 
+export const ClientSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    lastname: z.string().min(1, "Lastname is required"),
+    phoneNumber: z.string().min(1, "Phone number is required"),
+    ident: z.string().min(1, "Identification is required"),
+});
+
 export type SaleFormValues = z.infer<typeof SaleSchema>;
+export type ClientFormValues = z.infer<typeof ClientSchema>;
 

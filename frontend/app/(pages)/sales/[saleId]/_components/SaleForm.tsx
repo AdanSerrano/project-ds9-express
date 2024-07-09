@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray, UseFormReturn, FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
@@ -22,6 +22,7 @@ import { apiUrl } from '@/lib/api-url';
 import { AlertModal } from '@/components/modals/alert-modal';
 import { Trash } from 'lucide-react';
 import { Heading } from '@/components/ui/heading';
+import { token, verificationToken } from '@/lib/verificationToken';
 
 
 interface SaleFormProps {
@@ -52,6 +53,22 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
                 details: [{ product: '', quantity: 1, price: 0 }],
             },
     });
+
+    useEffect(() => {
+        if (initialData) {
+            form.reset({
+                clientId: initialData.clientId,
+                saleDate: initialData.saleDate,
+                details: initialData.details ? initialData.details.map(detail => ({
+                    product: detail.product,
+                    quantity: detail.quantity,
+                    price: detail.price,
+                }))
+                    : [{ product: '', quantity: 1, price: 0 }]
+            });
+        }
+    }, [initialData, form]);
+
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: 'details',
@@ -60,12 +77,12 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
     const onSubmit = (values: SaleFormValues) => {
         const transformedValues = {
             ...values,
-            saleDate: values.saleDate ? new Date(values.saleDate) : new Date(), // Asegúrate de que saleDate sea una fecha válida
+            saleDate: values.saleDate ? new Date(values.saleDate) : new Date(),
             details: values.details.map(detail => ({
                 ...detail,
                 quantity: Number(detail),
                 price: Number(detail.price),
-                total: Number(detail.quantity) * Number(detail.price) // Calcula el total por producto
+                total: Number(detail.quantity) * Number(detail.price)
             }))
         };
 
@@ -74,9 +91,17 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
         startTransition(async () => {
             try {
                 if (initialData) {
-                    await axios.put(`${apiUrl}/api/sales/${params.saleId}`, transformedValues);
+                    await axios.put(`${apiUrl}/api/sales/${params.saleId}`, transformedValues, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
                 } else {
-                    await axios.post(`${apiUrl}/api/sales`, transformedValues);
+                    await axios.post(`${apiUrl}/api/sales`, transformedValues, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
                 }
                 router.push(`/sales`)
                 router.refresh();
@@ -100,7 +125,11 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
     const onDelete = async () => {
         try {
 
-            await axios.delete(`${apiUrl}/api/sales/${params.productsId}`);
+            await axios.delete(`${apiUrl}/api/sales/${params.productsId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             router.push(`/sales`);
             router.refresh();
             toast.success("Sales deleted successfully");
@@ -136,7 +165,7 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
             )}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-                    <section className='space-y-4'>
+                    <section className='space-y-4 '>
                         <FormField
                             control={form.control}
                             name="clientId"
@@ -257,7 +286,7 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
                             onClick={() => append({ product: '', quantity: 1, price: 0 })}
                             disabled={fields.length >= 10}
                         >
-                            Add New Product
+                            Agregar Nuevo Product
                         </Button>
                     </section>
                     <FormError message={error} />
