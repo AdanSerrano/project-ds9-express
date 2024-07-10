@@ -55,16 +55,7 @@ const UserRouter = (app: Router): Router => {
 
       res.status(200).json({
         errorMessages: false,
-        data: {
-          users: users.map((user: any) => {
-            return {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              role: user.role,
-            };
-          }),
-        },
+        data: users
       });
     } catch (error: unknown) {
       res.status(500).json({ message: "Internal server error." });
@@ -80,17 +71,13 @@ const UserRouter = (app: Router): Router => {
       if (user) {
         res.status(200).json({
           errorMessages: false,
-          data: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          },
+          success: 'User found successfully',
+          user
         });
       } else {
         res.status(400).json({
           errorMessages: true,
-          message: "User not found",
+          error: "User not found",
         });
       }
     } catch (error: unknown) {
@@ -108,18 +95,13 @@ const UserRouter = (app: Router): Router => {
       if (resp) {
         res.status(200).json({
           errorMessages: false,
-          message: "User updated successfully",
-          data: {
-            id: resp.id,
-            name: resp.name,
-            email: resp.email,
-            role: resp.role,
-          },
+          success: "User updated successfully",
+          resp
         });
       } else {
         res.status(400).json({
           errorMessages: true,
-          message: "User not found",
+          error: "User not found",
         });
       }
     } catch (error: unknown) {

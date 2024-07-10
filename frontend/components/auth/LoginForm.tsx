@@ -38,7 +38,7 @@ export const LoginForm = () => {
                 const response = await axios.post(`${apiUrl}/api/auth/login`, values);
                 if (response.data.success) {
                     sessionStorage.setItem('token', response.data.token);
-                    sessionStorage.setItem('User', JSON.stringify(response.data.userInfo));
+                    sessionStorage.setItem('user', JSON.stringify(response.data.userInfo));
                     setSuccess(response.data.success);
                     toast.success(response.data.success);
                     router.push('/sales');

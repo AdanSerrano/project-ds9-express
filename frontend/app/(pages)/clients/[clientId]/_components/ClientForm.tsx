@@ -16,7 +16,7 @@ import { ClientFormValues, ClientSchema } from '@/schema';
 import { Client } from '@/interface';
 import { apiUrl } from '@/lib/api-url';
 import { AlertModal } from '@/components/modals/alert-modal';
-import { token } from '@/lib/verificationToken';
+import { getToken } from '@/lib/verificationToken';
 
 interface ClientFormProps {
     initialData?: Client | null;
@@ -66,13 +66,13 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
                 if (initialData) {
                     await axios.put(`${apiUrl}/api/clients/${params.clientId}`, values, {
                         headers: {
-                            Authorization: `Bearer ${token}`
+                            Authorization: `Bearer ${getToken()}`
                         }
                     });
                 } else {
                     await axios.post(`${apiUrl}/api/clients`, values, {
                         headers: {
-                            Authorization: `Bearer ${token}`
+                            Authorization: `Bearer ${getToken()}`
                         }
                     });
                 }
@@ -99,7 +99,7 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
         try {
             await axios.delete(`${apiUrl}/api/clients/${params.clientId}`, {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${getToken()}`
                 }
             });
             router.push(`/clients`);

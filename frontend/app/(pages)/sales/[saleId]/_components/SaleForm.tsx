@@ -17,19 +17,21 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { Sale } from '@/interface';
+import { Client, Sale } from '@/interface';
 import { apiUrl } from '@/lib/api-url';
 import { AlertModal } from '@/components/modals/alert-modal';
 import { Trash } from 'lucide-react';
 import { Heading } from '@/components/ui/heading';
-import { token, verificationToken } from '@/lib/verificationToken';
+import { getToken } from '@/lib/verificationToken';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 interface SaleFormProps {
     initialData?: Sale | null;
+    clients?: Client[] | null;
 }
 
-export const SaleForm = ({ initialData }: SaleFormProps) => {
+export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     const [isPending, startTransition] = useTransition();
     const [success, setSuccess] = useState<string | undefined>('');
     const [open, setOpen] = useState(false);
@@ -43,15 +45,13 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
     const toastMessage = initialData ? 'Edit a Sale' : 'Sale Created.';
     const action = initialData ? 'Save Change' : 'Create';
 
-    console.log(initialData)
     const form = useForm<SaleFormValues>({
         resolver: zodResolver(SaleSchema),
-        defaultValues: initialData ?
-            initialData : {
-                clientId: '',
-                saleDate: new Date(),
-                details: [{ product: '', quantity: 1, price: 0 }],
-            },
+        defaultValues: {
+            clientId: '',
+            saleDate: new Date(),
+            details: [{ product: '', quantity: 1, price: 0 }],
+        },
     });
 
     useEffect(() => {
@@ -75,37 +75,27 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
     });
 
     const onSubmit = (values: SaleFormValues) => {
-        const transformedValues = {
-            ...values,
-            saleDate: values.saleDate ? new Date(values.saleDate) : new Date(),
-            details: values.details.map(detail => ({
-                ...detail,
-                quantity: Number(detail),
-                price: Number(detail.price),
-                total: Number(detail.quantity) * Number(detail.price)
-            }))
-        };
-
         setError('');
         setSuccess('');
         startTransition(async () => {
             try {
                 if (initialData) {
-                    await axios.put(`${apiUrl}/api/sales/${params.saleId}`, transformedValues, {
+                    const response = await axios.put(`${apiUrl}/api/sales/${params.saleId}`, values, {
                         headers: {
-                            Authorization: `Bearer ${token}`
+                            Authorization: `Bearer ${getToken()}`
                         }
                     });
+                    toast.success(response.data.success)
                 } else {
-                    await axios.post(`${apiUrl}/api/sales`, transformedValues, {
+                    const response = await axios.post(`${apiUrl}/api/sales`, values, {
                         headers: {
-                            Authorization: `Bearer ${token}`
+                            Authorization: `Bearer ${getToken()}`
                         }
                     });
+                    toast.success(response.data.success)
                 }
                 router.push(`/sales`)
                 router.refresh();
-                toast.success(toastMessage);
             } catch (error: unknown) {
                 if (axios.isAxiosError(error)) {
                     if (error.response) {
@@ -125,9 +115,9 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
     const onDelete = async () => {
         try {
 
-            await axios.delete(`${apiUrl}/api/sales/${params.productsId}`, {
+            await axios.delete(`${apiUrl}/api/sales/${params.saleId}`, {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${getToken()}`
                 }
             });
             router.push(`/sales`);
@@ -172,10 +162,29 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className='text-white'>Client ID</FormLabel>
-                                    <FormControl>
-                                        <Input disabled={isPending} placeholder="Client ID" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
+                                    <Select
+                                        disabled={isPending}
+                                        onValueChange={field.onChange}
+                                        value={field.value}
+                                        defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger defaultValue={field.value} >
+                                                <SelectValue placeholder="Selecciona una cliente" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Cliente</SelectLabel>
+                                                {clients?.map((client) => (
+                                                    <SelectItem key={client.id} value={client.id || ''}>
+                                                        {client.name}{' '}{client.lastname}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+
                                 </FormItem>
                             )}
                         />

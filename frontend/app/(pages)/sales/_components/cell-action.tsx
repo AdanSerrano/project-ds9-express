@@ -11,7 +11,7 @@ import { toast } from "sonner"
 import { useState } from "react"
 import { SalesColumns } from "./columns"
 import { apiUrl } from "@/lib/api-url"
-import { token } from "@/lib/verificationToken"
+import { getToken } from "@/lib/verificationToken"
 
 interface CellActionProps {
     data: SalesColumns
@@ -36,9 +36,9 @@ export const CellAction = ({ data }: CellActionProps) => {
     const onDelete = async () => {
         try {
             setLoading(true)
-            await axios.delete(`${apiUrl}/api/sales/${data.clientId}`, {
+            await axios.delete(`${apiUrl}/api/sales/${data.id}`, {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${getToken()}`
                 }
             })
             location.reload()

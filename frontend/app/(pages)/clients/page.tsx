@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react'
 import { ClientsColumns } from './_components/columns'
 import { ClientsClient } from './_components/client'
 import axios from 'axios'
+import { getToken } from '@/lib/verificationToken'
 
 export default function ClientsPage() {
     const [clients, setClients] = useState<Client[] | null>([])
@@ -19,12 +20,11 @@ export default function ClientsPage() {
                 const token = sessionStorage.getItem('token');
                 const response = await axios.get(`${apiUrl}/api/clients`, {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${getToken()}`,
                     },
                 }
                 );
                 setClients(response.data)
-                console.log(response.data)
             } catch (error) {
                 console.log('error fetching data', error)
             }

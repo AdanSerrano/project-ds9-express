@@ -6,6 +6,7 @@ import { apiUrl } from "@/lib/api-url";
 import { User } from "@/interface";
 import { CardComponents } from "@/components/auth/CardComponents";
 import axios from "axios";
+import { getToken } from "@/lib/verificationToken";
 
 export default function Home() {
     const [users, setUsers] = useState<User[]>([]);
@@ -18,11 +19,11 @@ export default function Home() {
                 const token = sessionStorage.getItem('token');
                 const response = await axios.get(`${apiUrl}/api/users`, {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${getToken()}`,
                     },
                 });
 
-                setUsers(response.data);
+                setUsers(response.data.users);
             } catch (error) {
                 console.log('error fetching data', error);
                 setError('Error fetching data');

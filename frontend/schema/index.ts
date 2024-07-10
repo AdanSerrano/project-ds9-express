@@ -22,7 +22,9 @@ export const SaleSchema = z.object({
             quantity: z.number().min(1, "Quantity must be at least 1"),
             price: z.number().min(0, "Price must be a positive number"),
         })
-    ).min(1, "At least one product is required").max(10, "Maximum 10 products allowed"),
+    )
+    // .min(1, "At least one product is required").max(10, "Maximum 10 products allowed")
+    ,
 });
 
 export const ClientSchema = z.object({

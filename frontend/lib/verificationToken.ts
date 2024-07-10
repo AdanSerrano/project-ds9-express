@@ -5,19 +5,32 @@ export const isLoggedIn = () => {
     return !!token;
 };
 
-
-export const LogoutClick = () => {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('User');
-}
+export const setCurrentUser = (user: User | null) => {
+    if (user) {
+        sessionStorage.setItem('user', JSON.stringify(user));
+    } else {
+        sessionStorage.removeItem('user');
+    }
+};
 
 export const currentUser = (): User | null => {
-    const user = sessionStorage.getItem('User');
-    return user ? JSON.parse(user) : null;
-}
+    const userString = sessionStorage.getItem('user');
+    return userString ? JSON.parse(userString) : null;
+};
 
 export const verificationToken = (token: string) => {
     sessionStorage.setItem('token', token);
 }
 
-export const token = sessionStorage.getItem('token');
+export const LogoutClick = () => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+};
+
+export const setToken = (token: string) => {
+    sessionStorage.setItem('token', token);
+};
+
+export const getToken = () => {
+    return sessionStorage.getItem('token');
+};

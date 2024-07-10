@@ -25,18 +25,11 @@ const SaleRouter = (app: Router): Router => {
         details
       );
 
-      if (sale) {
-        res.status(201).json({
-          errorMessages: false,
-          success: "Venta registrada exitosamente",
-          data: saleFormat(sale),
-        });
-      } else {
-        res.status(400).json({
-          errorMessages: true,
-          error: "Esta venta ya existe",
-        });
-      }
+      res.status(201).json({
+        errorMessages: false,
+        success: "Venta registrada exitosamente",
+        sale
+      });
     } catch (error: unknown) {
       res.status(500).json({ error: "Internal server error." });
     }
@@ -44,30 +37,29 @@ const SaleRouter = (app: Router): Router => {
 
   router.get("/", verifyTokenMiddleware, async (req, res) => {
     try {
-      const sale = await saleController.findAllSales();
+      const sales = await saleController.findAllSales();
 
-      console.log();
-
-      res.status(200).json({
-        errorMessages: false,
-        data: saleFormat(sale),
-      });
+      res.status(200).json(sales);
     } catch (error: unknown) {
       console.error(error);
       res.status(500).json({ error: "Internal server error." });
     }
   });
 
-  router.get("/:id", verifyTokenMiddleware, async (req, res) => {
+  router.get("/:id", async (req, res) => {
     try {
       const { id } = req.params;
       const sale = await saleController.getOneSales(id);
 
-      res.status(200).json({
-        errorMessages: false,
-        data: saleFormat(sale),
-      });
+      if (!sale) {
+        res.status(404).json({
+          errorMessages: true,
+          error: "Venta no encontrada",
+        });
+      }
+      res.status(200).json(sale);
     } catch (error: unknown) {
+      console.log(error)
       res.status(500).json({ error: "Internal server error." });
     }
   });
@@ -122,8 +114,6 @@ const SaleRouter = (app: Router): Router => {
       const { saleId, details } = req.body;
       const sale = await saleController.createSalesDetails(saleId, details);
 
-      console.log(sale);
-
       res.status(200).json({
         errorMessages: false,
         success: "Detalle registrado exitosamente",
@@ -148,7 +138,7 @@ const SaleRouter = (app: Router): Router => {
     }
   });
 
-  
+
 
   function saleFormat(sale: any) {
     if (!Array.isArray(sale)) {

@@ -5,6 +5,7 @@ import { apiUrl } from "@/lib/api-url";
 import { Client } from "@/interface";
 import { MaxWidthWrappper } from "@/components/MaxWidthWrapper";
 import { ClientForm } from "./_components/ClientForm";
+import { getToken } from "@/lib/verificationToken";
 
 export default function SaleIdPage({ params }: { params: { clientId: string } }) {
     const [client, setClient] = useState<Client | null>(null)
@@ -17,7 +18,7 @@ export default function SaleIdPage({ params }: { params: { clientId: string } })
                 const token = sessionStorage.getItem('token');
                 const response = await axios.get(`${apiUrl}/api/clients/${params.clientId}`, {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${getToken()}`,
                     },
                 });
                 setClient(response.data)
@@ -31,7 +32,7 @@ export default function SaleIdPage({ params }: { params: { clientId: string } })
         }
         fetchData()
     }, [params.clientId])
-    console.log(client)
+
     return (
         <MaxWidthWrappper className='flex-col'>
             <div className='flex-1 space-y-4 p-8 pt-6'>
