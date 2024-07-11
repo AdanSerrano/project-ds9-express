@@ -3,12 +3,20 @@ import { MaxWidthWrappper } from './MaxWidthWrapper'
 import Link from 'next/link'
 import { Button, buttonVariants } from './ui/button'
 import { useRouter } from 'next/navigation'
-import { isLoggedIn, LogoutClick } from '@/lib/verificationToken'
+import { currentUser, isLoggedIn, LogoutClick } from '@/lib/verificationToken'
+import axios from 'axios'
+import { apiUrl } from '@/lib/api-url'
+import { User } from '@/interface'
 
 export const NabarComponent = () => {
     const [isLoggedin, setIsLoggedin] = useState(false)
-
+    const [user, setUser] = useState<User | null>(null);
     const router = useRouter()
+
+    useEffect(() => {
+        setUser(currentUser());
+    }, []);
+
 
     useEffect(() => {
         setIsLoggedin(isLoggedIn())
@@ -60,6 +68,36 @@ export const NabarComponent = () => {
                             </>
                         ) : (
                             <>
+                                {user?.role === 'ADMIN' ? (
+                                    <>
+                                        <Link
+                                            href={'/clients'}
+                                            className={buttonVariants({
+                                                size: 'sm',
+                                                variant: 'ghost'
+                                            })}>
+                                            Clientes
+                                        </Link>
+                                        <Link
+                                            href={'/sales'}
+                                            className={buttonVariants({
+                                                size: 'sm',
+                                                variant: 'ghost'
+                                            })}>
+                                            Facturas
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <Link
+                                        href={'/payments'}
+                                        className={buttonVariants({
+                                            size: 'sm',
+                                            variant: 'ghost'
+                                        })}>
+                                        Pagar Factura
+                                    </Link>
+                                )}
+                                <div className="h-8 w-px bg-white-100 hidden sm:block" />
                                 <Button onClick={onLogout} variant="ghost" className="border text-sm font-medium relative border-neutral-200 border-white/[0.2] text-white px-4 py-2 rounded-full">
                                     Logout
                                     <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent h-px" />

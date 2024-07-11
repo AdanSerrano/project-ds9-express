@@ -35,7 +35,7 @@ export const SalesClient = ({ data }: SalesClientProps) => {
                 />
                 <Button onClick={() => router.push(`/sales/news`)}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Add New
+                    Agregar Nuevo
                 </Button>
             </div>
             <Separator />

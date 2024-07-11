@@ -63,7 +63,6 @@ class SalesModel {
       },
     });
 
-    console.log("sales", sales);
     return sales;
   }
 

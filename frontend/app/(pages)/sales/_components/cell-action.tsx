@@ -11,6 +11,7 @@ import { toast } from "sonner"
 import { useState } from "react"
 import { SalesColumns } from "./columns"
 import { apiUrl } from "@/lib/api-url"
+import { getToken } from "@/lib/verificationToken"
 
 interface CellActionProps {
     data: SalesColumns
@@ -35,9 +36,12 @@ export const CellAction = ({ data }: CellActionProps) => {
     const onDelete = async () => {
         try {
             setLoading(true)
-            await axios.delete(`${apiUrl}/api/sales/${data.clientId}`)
-            router.push(`/sales`)
-            router.refresh()
+            await axios.delete(`${apiUrl}/api/sales/${data.id}`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`
+                }
+            })
+            location.reload()
             toast.success("sales deleted successfully")
         } catch (error) {
             toast.error("Something went wrong")

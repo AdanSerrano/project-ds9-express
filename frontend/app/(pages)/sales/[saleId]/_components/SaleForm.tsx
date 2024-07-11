@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray, UseFormReturn, FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
@@ -17,18 +17,21 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { Sale } from '@/interface';
+import { Client, Sale } from '@/interface';
 import { apiUrl } from '@/lib/api-url';
 import { AlertModal } from '@/components/modals/alert-modal';
 import { Trash } from 'lucide-react';
 import { Heading } from '@/components/ui/heading';
+import { getToken } from '@/lib/verificationToken';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 interface SaleFormProps {
     initialData?: Sale | null;
+    clients?: Client[] | null;
 }
 
-export const SaleForm = ({ initialData }: SaleFormProps) => {
+export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     const [isPending, startTransition] = useTransition();
     const [success, setSuccess] = useState<string | undefined>('');
     const [open, setOpen] = useState(false);
@@ -42,45 +45,57 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
     const toastMessage = initialData ? 'Edit a Sale' : 'Sale Created.';
     const action = initialData ? 'Save Change' : 'Create';
 
-    console.log(initialData)
     const form = useForm<SaleFormValues>({
         resolver: zodResolver(SaleSchema),
-        defaultValues: initialData ?
-            initialData : {
-                clientId: '',
-                saleDate: new Date(),
-                details: [{ product: '', quantity: 1, price: 0 }],
-            },
+        defaultValues: {
+            clientId: '',
+            saleDate: new Date(),
+            details: [{ product: '', quantity: 1, price: 0 }],
+        },
     });
+
+    useEffect(() => {
+        if (initialData) {
+            form.reset({
+                clientId: initialData.clientId,
+                saleDate: initialData.saleDate,
+                details: initialData.details ? initialData.details.map(detail => ({
+                    product: detail.product,
+                    quantity: detail.quantity,
+                    price: detail.price,
+                }))
+                    : [{ product: '', quantity: 1, price: 0 }]
+            });
+        }
+    }, [initialData, form]);
+
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: 'details',
     });
 
     const onSubmit = (values: SaleFormValues) => {
-        const transformedValues = {
-            ...values,
-            saleDate: values.saleDate ? new Date(values.saleDate) : new Date(), // Asegúrate de que saleDate sea una fecha válida
-            details: values.details.map(detail => ({
-                ...detail,
-                quantity: Number(detail),
-                price: Number(detail.price),
-                total: Number(detail.quantity) * Number(detail.price) // Calcula el total por producto
-            }))
-        };
-
         setError('');
         setSuccess('');
         startTransition(async () => {
             try {
                 if (initialData) {
-                    await axios.put(`${apiUrl}/api/sales/${params.saleId}`, transformedValues);
+                    const response = await axios.put(`${apiUrl}/api/sales/${params.saleId}`, values, {
+                        headers: {
+                            Authorization: `Bearer ${getToken()}`
+                        }
+                    });
+                    toast.success(response.data.success)
                 } else {
-                    await axios.post(`${apiUrl}/api/sales`, transformedValues);
+                    const response = await axios.post(`${apiUrl}/api/sales`, values, {
+                        headers: {
+                            Authorization: `Bearer ${getToken()}`
+                        }
+                    });
+                    toast.success(response.data.success)
                 }
                 router.push(`/sales`)
                 router.refresh();
-                toast.success(toastMessage);
             } catch (error: unknown) {
                 if (axios.isAxiosError(error)) {
                     if (error.response) {
@@ -100,7 +115,11 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
     const onDelete = async () => {
         try {
 
-            await axios.delete(`${apiUrl}/api/sales/${params.productsId}`);
+            await axios.delete(`${apiUrl}/api/sales/${params.saleId}`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`
+                }
+            });
             router.push(`/sales`);
             router.refresh();
             toast.success("Sales deleted successfully");
@@ -136,17 +155,36 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
             )}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-                    <section className='space-y-4'>
+                    <section className='space-y-4 '>
                         <FormField
                             control={form.control}
                             name="clientId"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className='text-white'>Client ID</FormLabel>
-                                    <FormControl>
-                                        <Input disabled={isPending} placeholder="Client ID" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
+                                    <Select
+                                        disabled={isPending}
+                                        onValueChange={field.onChange}
+                                        value={field.value}
+                                        defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger defaultValue={field.value} >
+                                                <SelectValue placeholder="Selecciona una cliente" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Cliente</SelectLabel>
+                                                {clients?.map((client) => (
+                                                    <SelectItem key={client.id} value={client.id || ''}>
+                                                        {client.name}{' '}{client.lastname}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+
                                 </FormItem>
                             )}
                         />
@@ -257,7 +295,7 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
                             onClick={() => append({ product: '', quantity: 1, price: 0 })}
                             disabled={fields.length >= 10}
                         >
-                            Add New Product
+                            Agregar Nuevo Product
                         </Button>
                     </section>
                     <FormError message={error} />
