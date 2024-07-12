@@ -6,7 +6,6 @@ class SalesController {
     this.salesService = salesService;
   }
 
-
   async createSales(clientId: any, saleDate: any, details: any) {
     return await this.salesService.createSales(clientId, saleDate, details);
   }

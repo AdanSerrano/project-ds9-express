@@ -3,6 +3,9 @@ import AuthRouter from './auth.router';
 import { ClientRouter } from './client.router';
 import UserRouter from './user.router';
 import SalesRouter from './sales.router';
+import PaymentRouter from './payment.router';
+
+
 export const app_router = (app: Router) => [
     {
         path: '/api/auth',
@@ -20,4 +23,8 @@ export const app_router = (app: Router) => [
         path: '/api/sales',
         router: SalesRouter(app),
     },
+    {
+        path: '/api/payments',
+        router: PaymentRouter(app),
+    }
 ];
