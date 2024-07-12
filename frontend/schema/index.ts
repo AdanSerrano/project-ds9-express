@@ -14,17 +14,19 @@ export const RegisterSchema = z.object({
 export const SaleSchema = z.object({
     clientId: z.string().min(1, "Client ID is required"),
     saleDate: z.date({
-        required_error: "A date of birth is required.",
+        required_error: "A sale date is required.",
     }),
     details: z.array(
         z.object({
-            product: z.string().min(1, "Product is required"),
-            quantity: z.number().min(1, "Quantity must be at least 1"),
-            price: z.number().min(0, "Price must be a positive number"),
+            product: z.string().optional(),
+            quantity: z.coerce.number().optional(),
+            price: z.coerce.number().optional(),
+            tax: z.coerce.number().optional(),
+            discount: z.coerce.number().optional(),
         })
-    )
-    // .min(1, "At least one product is required").max(10, "Maximum 10 products allowed")
-    ,
+    ).nonempty({
+        message: "At least one detail is required"
+    })
 });
 
 export const ClientSchema = z.object({

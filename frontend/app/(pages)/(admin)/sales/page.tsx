@@ -32,7 +32,6 @@ export default function SalesPage() {
 
     const formattedProducts: SalesColumns[] = sales?.map((item) => ({
         id: item.id,
-        clientId: item.clients?.name,
         saleDate: format(new Date(item.saleDate), "MMMM do, yyyy", { locale: es }),
         details: item.details?.length,
         clients: item.clients?.name,
