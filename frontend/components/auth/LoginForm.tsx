@@ -49,7 +49,6 @@ export const LoginForm = () => {
                     sessionStorage.setItem('user', JSON.stringify(response.data.userInfo));
                     setSuccess(response.data.success);
                     toast.success(response.data.success);
-                    router.push(`${user?.role === 'ADMIN' ? '/sales' : '/payments'}`);
                 } else {
                     setError(response.data.error);
                     toast.error(response.data.error);

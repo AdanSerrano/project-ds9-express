@@ -56,7 +56,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
             form.reset({
                 clientId: initialData.clientId,
                 saleDate: new Date(initialData.saleDate),
-                details: initialData.details || []
+                details: []
             });
             setDetails(initialData.details?.map(detail => ({
                 product: detail.product || '',
@@ -72,8 +72,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
         setError('');
         startTransition(async () => {
             try {
-                const notEmptyDetails = values.details.filter(detail => detail.product !== '' && detail.quantity !== 0 && detail.price !== 0 && detail.tax !== 0 && detail.discount !== 0);
-                const dataToSubmit = { ...values, details: notEmptyDetails };
+                const dataToSubmit = { ...values, details };
                 if (initialData) {
                     const response = await axios.put(`${apiUrl}/api/sales/${params.saleId}`, dataToSubmit, {
                         headers: { Authorization: `Bearer ${getToken()}` }
@@ -217,104 +216,104 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                 </FormItem>
                             )}
                         />
-                        <div className='space-y-4'>
-                            <FormField
-                                control={form.control}
-                                name={`details.0.product`}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className='text-white'>Product</FormLabel>
-                                        <FormControl>
-                                            <Input disabled={isPending} placeholder="Product Name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name={`details.0.quantity`}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className='text-white'>Cantidad</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                disabled={isPending}
-                                                placeholder="Cantidad"
-                                                type="number"
-                                                {...field}
-                                                onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name={`details.0.price`}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className='text-white'>Price</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                disabled={isPending}
-                                                placeholder="Precio"
-                                                type="number"
-                                                {...field}
-                                                onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name={`details.0.tax`}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className='text-white'>Tax</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                disabled={isPending}
-                                                placeholder="Tax"
-                                                type="number"
-                                                {...field}
-                                                onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name={`details.0.discount`}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className='text-white'>Discount</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                disabled={isPending}
-                                                placeholder="Discount"
-                                                type="number"
-                                                {...field}
-                                                onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <Button
-                                type="button"
-                                onClick={addProduct}
-                            >
-                                Add Product
-                            </Button>
-                        </div>
                     </section>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 items-center justify-center gap-2'>
+                        <FormField
+                            control={form.control}
+                            name={`details.0.product`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Product</FormLabel>
+                                    <FormControl>
+                                        <Input disabled={isPending} placeholder="Product Name" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`details.0.quantity`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Cantidad</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isPending}
+                                            placeholder="Cantidad"
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`details.0.price`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Price</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isPending}
+                                            placeholder="Precio"
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`details.0.tax`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Tax</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isPending}
+                                            placeholder="Tax"
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`details.0.discount`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Discount</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isPending}
+                                            placeholder="Discount"
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button
+                            type="button"
+                            onClick={addProduct}
+                        >
+                            Add Product
+                        </Button>
+                    </div>
 
                     <Table>
                         <TableHeader>

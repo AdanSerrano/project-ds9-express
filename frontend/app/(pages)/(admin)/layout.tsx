@@ -9,20 +9,30 @@ export default function PageLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
-
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
     useEffect(() => {
-        setUser(currentUser());
+        const fetchUser = async () => {
+            const userData = currentUser();
+            setUser(userData);
+            setLoading(false);
+        };
+        fetchUser();
     }, []);
 
+    if (loading) return (<div className="text-white">Loading...</div>);
+
     if (user?.role !== 'ADMIN') {
-        notFound()
+        notFound() || router.push(`${user?.role === 'ADMIN' ? '/sales' : '/payments'}`);
     }
 
     return (
         <>
             {children}
+            <div className="bg-white">
+                USER.role: {user?.role || 'No role'}
+            </div>
         </>
     );
 }
