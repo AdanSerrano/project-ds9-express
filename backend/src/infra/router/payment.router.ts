@@ -20,17 +20,17 @@ const PaymentRouter = (app: Router): Router => {
     try {
       const { clientId, saleId, paymentDate, amount } = req.body;
 
-      const payment = await paymentController.createPayment(
+      /*const payment = await paymentController.createPayment(
         clientId,
         saleId,
         paymentDate,
         amount
-      );
+      );*/
 
       res.status(201).json({
         errorMessages: false,
         success: "Pago registrado exitosamente",
-        payment,
+        //payment,
       });
     } catch (error: unknown) {
       res.status(500).json({ error: "Internal server error." });

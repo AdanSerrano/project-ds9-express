@@ -22,6 +22,10 @@ class SalesController {
     return await this.salesService.deleteSales(id);
   }
 
+  async updateSales(id: string, data: any) {
+    return await this.salesService.updateSales(id, data);
+  }
+
   async deleteSalesDetails(id: string) {
     return await this.salesService.deleteSalesDetails(id);
   }

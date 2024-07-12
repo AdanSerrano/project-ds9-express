@@ -88,6 +88,36 @@ class SalesModel {
     return sale;
   }
 
+  async updateSales(id: string, data: any): Promise<any> {
+    try {
+      const sale = await this.findUniqueSales(id);
+
+      if (!sale) {
+        return null;
+      }
+
+      const test = await this.database.sale.update({
+        where: {
+          id: id,
+        },
+        data: {
+          saleDate: new Date(data.saleDate),
+          clients: {
+            connect: {
+              id: data.clientId,
+            },
+          },
+        },
+      });
+
+      return this.findUniqueSales(id);
+    } catch (error: unknown) {
+      console.log("error  MODEL/SALE/UPDATE");
+      console.error(error);
+      return null;
+    }
+  }
+
   async deleteSalesDetails(id: string): Promise<any> {
     const saleDetail = await this.database.saleDetail.findUnique({
       where: {
