@@ -1,30 +1,27 @@
 'use client';
 import React, { useEffect, useState, useTransition } from 'react';
-import { useForm, useFieldArray, UseFormReturn, FieldValues } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useParams, useRouter } from 'next/navigation';
 import { SaleSchema, SaleFormValues } from '@/schema';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { CardWrapper } from '@/components/auth/CardWrapper';
 import { Input } from '@/components/ui/input';
-import { FormError } from '@/components/auth/FormError';
-import { FormSuccess } from '@/components/auth/FormSuccess';
 import { CalendarIcon } from '@radix-ui/react-icons';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { Client, Sale } from '@/interface';
+import { Client, Sale, SaleDetail } from '@/interface';
 import { apiUrl } from '@/lib/api-url';
 import { AlertModal } from '@/components/modals/alert-modal';
 import { Trash } from 'lucide-react';
 import { Heading } from '@/components/ui/heading';
 import { getToken } from '@/lib/verificationToken';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface SaleFormProps {
     initialData?: Sale | null;
@@ -33,24 +30,24 @@ interface SaleFormProps {
 
 export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     const [isPending, startTransition] = useTransition();
-    const [success, setSuccess] = useState<string | undefined>('');
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | undefined>('');
     const router = useRouter();
     const params = useParams();
 
+    const [details, setDetails] = useState<SaleDetail[]>([]);
+
     const title = initialData ? 'Edit Sale' : 'Create Sale';
     const description = initialData ? 'Sale updated' : 'Add a new Sale';
-    const toastMessage = initialData ? 'Edit a Sale' : 'Sale Created.';
     const action = initialData ? 'Save Change' : 'Create';
 
     const form = useForm<SaleFormValues>({
         resolver: zodResolver(SaleSchema),
         defaultValues: {
             clientId: '',
-            saleDate: new Date(),
-            details: [{ product: '', quantity: 1, price: 0 }],
+            saleDate: undefined,
+            details: [],
         },
     });
 
@@ -58,52 +55,41 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
         if (initialData) {
             form.reset({
                 clientId: initialData.clientId,
-                saleDate: initialData.saleDate,
-                details: initialData.details ? initialData.details.map(detail => ({
-                    product: detail.product,
-                    quantity: detail.quantity,
-                    price: detail.price,
-                }))
-                    : [{ product: '', quantity: 1, price: 0 }]
+                saleDate: new Date(initialData.saleDate),
+                details: []
             });
+            setDetails(initialData.details?.map(detail => ({
+                product: detail.product || '',
+                quantity: Number(detail.quantity),
+                price: Number(detail.price),
+                tax: Number(detail.tax),
+                discount: Number(detail.discount)
+            })) || []);
         }
     }, [initialData, form]);
 
-    const { fields, append, remove } = useFieldArray({
-        control: form.control,
-        name: 'details',
-    });
-
     const onSubmit = (values: SaleFormValues) => {
         setError('');
-        setSuccess('');
         startTransition(async () => {
             try {
+                const dataToSubmit = { ...values, details };
                 if (initialData) {
-                    const response = await axios.put(`${apiUrl}/api/sales/${params.saleId}`, values, {
-                        headers: {
-                            Authorization: `Bearer ${getToken()}`
-                        }
+                    const response = await axios.put(`${apiUrl}/api/sales/${params.saleId}`, dataToSubmit, {
+                        headers: { Authorization: `Bearer ${getToken()}` }
                     });
                     toast.success(response.data.success)
                 } else {
-                    const response = await axios.post(`${apiUrl}/api/sales`, values, {
-                        headers: {
-                            Authorization: `Bearer ${getToken()}`
-                        }
+                    const response = await axios.post(`${apiUrl}/api/sales`, dataToSubmit, {
+                        headers: { Authorization: `Bearer ${getToken()}` }
                     });
                     toast.success(response.data.success)
                 }
                 router.push(`/sales`)
                 router.refresh();
-            } catch (error: unknown) {
-                if (axios.isAxiosError(error)) {
-                    if (error.response) {
-                        setError(error.response.data.error);
-                        toast.error(error.response.data.error);
-                    } else {
-                        setError('An unexpected error occurred');
-                    }
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    setError(error.response.data.error);
+                    toast.error(error.response.data.error);
                 } else {
                     console.error('Unexpected error:', error);
                     setError('An unexpected error occurred');
@@ -114,11 +100,8 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
 
     const onDelete = async () => {
         try {
-
             await axios.delete(`${apiUrl}/api/sales/${params.saleId}`, {
-                headers: {
-                    Authorization: `Bearer ${getToken()}`
-                }
+                headers: { Authorization: `Bearer ${getToken()}` }
             });
             router.push(`/sales`);
             router.refresh();
@@ -131,9 +114,14 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
         }
     };
 
+    const addProduct = () => {
+        const newProduct = form.getValues('details')[0];
+        setDetails([...details, newProduct]);
+        form.reset({ ...form.getValues(), details: [{ product: '', quantity: 0, price: 0, tax: 0, discount: 0 }] });
+    };
+
     return (
         <>
-
             <AlertModal
                 isOpen={open}
                 onClose={() => setOpen(false)}
@@ -155,7 +143,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
             )}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-                    <section className='space-y-4 '>
+                    <section className='space-y-4'>
                         <FormField
                             control={form.control}
                             name="clientId"
@@ -184,7 +172,6 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-
                                 </FormItem>
                             )}
                         />
@@ -193,7 +180,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                             name="saleDate"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                    <FormLabel className='text-white'>Date of birth</FormLabel>
+                                    <FormLabel className='text-white'>Date of sale</FormLabel>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <FormControl>
@@ -229,77 +216,128 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                 </FormItem>
                             )}
                         />
-                        {fields.map((field, index) => (
-                            <div key={field.id} className='space-y-4'>
-                                <FormField
-                                    control={form.control}
-                                    name={`details.${index}.product`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className='text-white'>Product</FormLabel>
-                                            <FormControl>
-                                                <Input disabled={isPending} placeholder="Product Name" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`details.${index}.quantity`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className='text-white'>Quantity</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    disabled={isPending}
-                                                    placeholder="Quantity"
-                                                    value={field.value}
-                                                    onChange={e => field.onChange(Number(e.target.value))}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`details.${index}.price`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className='text-white'>Price</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    disabled={isPending}
-                                                    placeholder="Price"
-                                                    {...field}
-                                                    onChange={e => field.onChange(Number(e.target.value))}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button
-                                    type="button"
-                                    onClick={() => remove(index)}
-                                >
-                                    Remove Product
-                                </Button>
-                            </div>
-                        ))}
+                    </section>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 items-center justify-center gap-2'>
+                        <FormField
+                            control={form.control}
+                            name={`details.0.product`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Product</FormLabel>
+                                    <FormControl>
+                                        <Input disabled={isPending} placeholder="Product Name" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`details.0.quantity`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Cantidad</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isPending}
+                                            placeholder="Cantidad"
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`details.0.price`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Price</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isPending}
+                                            placeholder="Precio"
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`details.0.tax`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Tax</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isPending}
+                                            placeholder="Tax"
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`details.0.discount`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-white'>Discount</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isPending}
+                                            placeholder="Discount"
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <Button
                             type="button"
-                            onClick={() => append({ product: '', quantity: 1, price: 0 })}
-                            disabled={fields.length >= 10}
+                            onClick={addProduct}
                         >
-                            Agregar Nuevo Product
+                            Add Product
                         </Button>
-                    </section>
-                    <FormError message={error} />
-                    <FormSuccess message={success} />
+                    </div>
+
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Product</TableHead>
+                                <TableHead>Quantity</TableHead>
+                                <TableHead>Price</TableHead>
+                                <TableHead>Tax</TableHead>
+                                <TableHead>Discount</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {details.map((detail, index) => (
+                                <TableRow className='text-white' key={index}>
+                                    <TableCell>{detail.product}</TableCell>
+                                    <TableCell>{detail.quantity}</TableCell>
+                                    <TableCell>{detail.price}</TableCell>
+                                    <TableCell>{detail.tax}</TableCell>
+                                    <TableCell>{detail.discount}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+
                     <Button className='w-full' type="submit" disabled={isPending}>
                         Submit Sale
                     </Button>

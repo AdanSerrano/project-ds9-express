@@ -81,17 +81,17 @@ export const CellAction = ({ data }: CellActionProps) => {
                         ) : (
                             <>
                                 <Copy className="mr-2 h-4 w-4" />
-                                Copy
+                                Copiar
                             </>
                         )}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => router.push(`/sales/${data.id}`)}>
                         <Edit className="mr-2 h-4 w-4" />
-                        Update
+                        Actualizar
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setOpen(true)} className="text-red-500 hover:text-red-500 focus:text-red-700">
                         <Trash className="mr-2 h-4 w-4" />
-                        Delete
+                        Eliminar
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

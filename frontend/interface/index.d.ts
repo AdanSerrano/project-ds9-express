@@ -28,6 +28,10 @@ export interface SaleDetail {
     product?: string;
     quantity?: number;
     price?: number;
+    tax?: number;
+    discount?: number;
+    saleId?: string;
+    sale?: Sale;
 }
 
 export interface SaleById {

@@ -5,7 +5,6 @@ import { ReactNode } from "react";
 
 export type SalesColumns = {
     id: string | undefined;
-    clientId: string | undefined;
     saleDate: Date | ReactNode | undefined;
     details: number | undefined;
     clients: string | undefined;
@@ -18,20 +17,16 @@ export const columns: ColumnDef<SalesColumns>[] = [
         header: "Id"
     },
     {
-        accessorKey: "clientId",
-        header: "ClientId"
-    },
-    {
-        accessorKey: "saleDate",
-        header: "Date"
+        accessorKey: "clients",
+        header: "Nombre de Cliente"
     },
     {
         accessorKey: "details",
         header: "details"
     },
     {
-        accessorKey: "clients",
-        header: "Clients"
+        accessorKey: "saleDate",
+        header: "details"
     },
     {
         id: 'actions',

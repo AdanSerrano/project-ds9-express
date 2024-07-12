@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Button } from '@/components/ui/button';
@@ -15,12 +15,20 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { apiUrl } from '@/lib/api-url';
+import { User } from "@/interface";
+import { currentUser } from "@/lib/verificationToken";
 
 export const LoginForm = () => {
     const [isPending, startTransition] = useTransition();
     const [success, setSuccess] = useState<string | undefined>('');
     const [error, setError] = useState<string | undefined>('');
     const router = useRouter();
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        setUser(currentUser());
+    }, []);
+
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -41,7 +49,6 @@ export const LoginForm = () => {
                     sessionStorage.setItem('user', JSON.stringify(response.data.userInfo));
                     setSuccess(response.data.success);
                     toast.success(response.data.success);
-                    router.push('/sales');
                 } else {
                     setError(response.data.error);
                     toast.error(response.data.error);

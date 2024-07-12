@@ -47,7 +47,7 @@ export const gridItems = [
         id: 3,
         title: "Nuestro Stack",
         description: "Actualmente construyendo un Proyecto en Next JS",
-        className: "lg:col-span-2 md:col-span-2 md:row-span-1",
+        className: "md:col-span-3 md:col-span-3 lg:ol-span-2 lg:col-span-2 md:row-span-1",
         imgClassName: "",
         titleClassName: "justify-center",
         img: "",
@@ -61,6 +61,6 @@ export const gridItems = [
         imgClassName: "",
         titleClassName: "justify-start",
         img: "/grid.svg",
-        spareImg: "/b4.svg",
+        spareImg: "/b5.svg",
     },
 ];

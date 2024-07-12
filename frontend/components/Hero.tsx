@@ -22,7 +22,7 @@ export const Hero = () => {
                     </h2>
                     <TextGenerateEffect
                         className='text-center text-[40px] md:text-5xl lg:text-6xl font-normal '
-                        words='ADMINISTRA TUS FACTURAS DE MANERA RAPIDA Y SEGURA'
+                        words='ADMINISTRA TUS FACTURAS DE MANERA RÁPIDA Y SEGURA'
                     />
 
                     <a href="#about">

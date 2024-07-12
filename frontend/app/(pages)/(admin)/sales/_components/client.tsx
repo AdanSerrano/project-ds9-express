@@ -1,6 +1,6 @@
 'use client'
 
-import { ClientsColumns, columns } from "./columns"
+import { SalesColumns, columns } from "./columns"
 import {
     Table,
     TableBody,
@@ -19,27 +19,27 @@ import { Heading } from "@/components/ui/heading"
 import { Plus } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 
-interface ClientsClientProps {
-    data: ClientsColumns[]
+interface SalesClientProps {
+    data: SalesColumns[]
 }
 
-export const ClientsClient = ({ data }: ClientsClientProps) => {
+export const SalesClient = ({ data }: SalesClientProps) => {
     const router = useRouter()
 
     return (
         <>
             <div className="flex items-center justify-between">
                 <Heading
-                    title={`Clientes (${data.length})`}
-                    description="Manejo Cliente"
+                    title={`Facturas (${data.length})`}
+                    description="Manejo de Facturas"
                 />
-                <Button onClick={() => router.push(`/clients/news`)}>
+                <Button onClick={() => router.push(`/sales/news`)}>
                     <Plus className="mr-2 h-4 w-4" />
                     Agregar Nuevo
                 </Button>
             </div>
             <Separator />
-            <DataTable searchKey="id" columns={columns} data={data} />
+            <DataTable searchKey="clients" columns={columns} data={data} />
         </>
     )
 }
