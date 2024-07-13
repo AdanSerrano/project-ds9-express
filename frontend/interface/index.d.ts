@@ -22,6 +22,8 @@ export interface Sale {
     saleDate?: Date | ReactNode;
     details?: SaleDetail[];
     clients?: Client;
+    invoiceId?: number;
+    TotalSale?: number;
 }
 
 export interface SaleDetail {

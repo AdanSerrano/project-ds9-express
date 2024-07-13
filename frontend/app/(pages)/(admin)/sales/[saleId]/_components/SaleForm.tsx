@@ -39,8 +39,6 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [details, setDetails] = useState<SaleDetail[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
-    const [clientId, setClientId] = useState<string>('');
-    const [saleDate, setSaleDate] = useState<Date | null>(null);
 
     const title = initialData ? 'Editar Factura' : 'Crear Factura';
     const description = initialData ? 'Actualizar Factura' : 'Agregar una nueva Factura';
@@ -50,7 +48,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
         resolver: zodResolver(SaleSchema),
         defaultValues: {
             clientId: '',
-            saleDate: undefined,
+            saleDate: new Date(),
             details: [],
         },
     });
@@ -58,24 +56,21 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     useEffect(() => {
         if (initialData) {
             form.reset({
-                clientId: initialData.clientId,
+                clientId: initialData.clients?.id,
                 saleDate: new Date(initialData.saleDate),
-                details: []
+                details: initialData.details || []
             });
             setDetails(initialData.details || []);
-            setClientId(initialData.clientId || '');
-            setSaleDate(new Date(initialData.saleDate));
         }
     }, [initialData, form]);
 
     const onSubmit = (values: SaleFormValues) => {
-        console.log(values)
         setError('');
         startTransition(async () => {
             try {
                 const dataToSubmit = {
                     ...values,
-                    details: details,
+                    details: details.length > 0 ? details : initialData?.details || [],
                 };
 
                 if (initialData) {
@@ -144,15 +139,24 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
         setEditIndex(null);
     };
 
+
     const calculateSubtotal = (detail: SaleDetail) => {
-        return ((detail.price || 0) * (detail.quantity || 0)) - (detail.discount || 0);
+        const price = detail.price || 0;
+        const quantity = detail.quantity || 0;
+        const discount = detail.discount || 0;
+        return (price * quantity) - discount;
+    };
+
+    const calculateITBMS = (detail: SaleDetail) => {
+        const taxRate = (detail.tax || 0) / 100; // Convertir porcentaje a decimal
+        return calculateSubtotal(detail) * taxRate;
     };
 
     const calculateTotal = (details: SaleDetail[]) => {
-        const ITBMS = details.reduce((acc, detail) => acc + calculateSubtotal(detail) * (detail.tax || 0), 0).toFixed(2);
-        return details.reduce((acc, detail) => acc + calculateSubtotal(detail), 0) + parseFloat(ITBMS);
+        const subtotal = details.reduce((acc, detail) => acc + calculateSubtotal(detail), 0);
+        const totalITBMS = details.reduce((acc, detail) => acc + calculateITBMS(detail), 0);
+        return subtotal + totalITBMS;
     };
-
 
     return (
         <>
@@ -191,7 +195,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                         defaultValue={field.value}
                                     >
                                         <FormControl>
-                                            <SelectTrigger defaultValue={field.value} >
+                                            <SelectTrigger defaultValue={field.value}>
                                                 <SelectValue placeholder="Selecciona una cliente" />
                                             </SelectTrigger>
                                         </FormControl>
@@ -200,7 +204,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                                 <SelectLabel>Cliente</SelectLabel>
                                                 {clients?.map((client) => (
                                                     <SelectItem key={client.id} value={client.id || ''}>
-                                                        {client.name}{' '}{client.lastname}
+                                                        {client.name} {client.lastname}
                                                     </SelectItem>
                                                 ))}
                                             </SelectGroup>
@@ -221,7 +225,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                                 <Button
                                                     variant={"outline"}
                                                     className={cn(
-                                                        "text-left  h-10 font-normal",
+                                                        "text-left h-10 font-normal",
                                                         !field.value && "text-muted-foreground"
                                                     )}
                                                 >
@@ -310,11 +314,11 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                     name={`details.0.tax`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className='text-white'>Tax</FormLabel>
+                                            <FormLabel className='text-white'>ITBMS (%)</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     disabled={isPending}
-                                                    placeholder="Tax"
+                                                    placeholder="ITBMS"
                                                     type="number"
                                                     {...field}
                                                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
@@ -492,8 +496,12 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                 <TableCell className='text-center'>{details.reduce((acc, detail) => acc + calculateSubtotal(detail), 0).toFixed(2)}</TableCell>
                             </TableRow>
                             <TableRow className='text-white'>
+                                <TableCell colSpan={5} className="text-right">ITBMS</TableCell>
+                                <TableCell className='text-center'>{details.reduce((acc, detail) => acc + calculateITBMS(detail), 0).toFixed(2)}</TableCell>
+                            </TableRow>
+                            <TableRow className='text-white'>
                                 <TableCell colSpan={5} className="text-right">Total</TableCell>
-                                <TableCell className='text-center'>{calculateTotal(details)}</TableCell>
+                                <TableCell className='text-center'>{calculateTotal(details).toFixed(2)}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
