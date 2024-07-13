@@ -31,12 +31,32 @@ const PaymentRouter = (app: Router): Router => {
         errorMessages: false,
         success: "Venta registrada exitosamente",
         data: {
-          clientId, paymentDate, saleId,amount
+          payment
         },
       });
     } catch (error: unknown) {
       res.status(500).json({ error: "Internal server error." });
       console.error(error);
+    }
+  });
+
+  router.get("/captureOrder" , async (req, res) => {
+    try {
+      const { token } = req.query;
+
+      console.log({token})
+
+      const payment = await paymentController.capturePayment(token);
+      res.status(200).json({
+        errorMessages: false,
+        success: "Venta registrada exitosamente",
+        data: {
+          payment
+        },
+      });
+    } catch (error: unknown) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error." });
     }
   });
 

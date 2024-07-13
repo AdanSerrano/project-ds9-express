@@ -39,7 +39,11 @@ const SaleRouter = (app: Router): Router => {
     try {
       const sales = await saleController.findAllSales();
 
-      res.status(200).json(sales);
+      res.status(200).json({
+        errorMessages: false,
+        error: "",
+        data: saleFormat(sales),
+      });
     } catch (error: unknown) {
       console.error(error);
       res.status(500).json({ error: "Internal server error." });
@@ -59,7 +63,7 @@ const SaleRouter = (app: Router): Router => {
       }
       res.status(200).json(saleFormat(sale));
     } catch (error: unknown) {
-      console.log(error)
+      console.log(error);
       res.status(500).json({ error: "Internal server error." });
     }
   });
@@ -82,9 +86,9 @@ const SaleRouter = (app: Router): Router => {
   router.put("/:id", verifyTokenMiddleware, async (req, res) => {
     try {
       const { id } = req.params;
-     
+
       const { clientId, saleDate } = req.body;
-      const sale = await saleController.updateSales(id, {clientId, saleDate});
+      const sale = await saleController.updateSales(id, { clientId, saleDate });
 
       res.status(200).json({
         errorMessages: false,
@@ -92,8 +96,8 @@ const SaleRouter = (app: Router): Router => {
         data: saleFormat(sale),
       });
     } catch (error: unknown) {
-      console.log("ERROR PUT SALE")
-      console.error(error)
+      console.log("ERROR PUT SALE");
+      console.error(error);
       res.status(500).json({ error: "Internal server error." });
     }
   });
@@ -156,8 +160,6 @@ const SaleRouter = (app: Router): Router => {
       res.status(500).json({ error: "Internal server error." });
     }
   });
-
-
 
   function saleFormat(sale: any) {
     if (!Array.isArray(sale)) {

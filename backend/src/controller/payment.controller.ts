@@ -94,26 +94,31 @@ class PaymentController {
     );
   }
 
-  async capturePayment() {
-    /*try {
+  async capturePayment(token: any | undefined) {
+    try {
+        console.log(token);
+        console.log(`${String(process.env.PAYPAL_URL).replace('api-m.', 'api.')}/v2/checkout/orders/${token}/capture`);
       const response = await axios.post(
-        `${PAYPAL_API}/v2/checkout/orders/${token}/capture`,
+        `${String(process.env.PAYPAL_URL).replace('api-m.', 'api.')}/v2/checkout/orders/${token}/capture`,
         {},
         {
           auth: {
-            username: PAYPAL_API_CLIENT,
-            password: PAYPAL_API_SECRET,
+            username: process.env.PAYPAL_CLIENT_ID || "",
+            password: process.env.PAYPAL_CLIENT_SECRET || "",
           },
         }
       );
 
       console.log(response.data);
 
-      res.redirect("/payed.html");
-    } catch (error) {
-      console.log(error.message);
-      return res.status(500).json({ message: "Internal Server error" });
-    }*/
+      //res.redirect("/payed.html");
+    } catch (error: unknown) {
+      console.log("error en capturePayment");
+      console.log(error);
+      //return res.status(500).json({ message: "Internal Server error" });
+    }
+
+    return "";
   }
 
   async findAllPayments() {
