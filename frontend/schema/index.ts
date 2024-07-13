@@ -32,6 +32,7 @@ export const SaleSchema = z.object({
 export const ClientSchema = z.object({
     name: z.string().min(1, "Name is required"),
     lastname: z.string().min(1, "Lastname is required"),
+    email: z.string().email(),
     phoneNumber: z.string().min(1, "Phone number is required"),
     ident: z.string().min(1, "Identification is required"),
 });

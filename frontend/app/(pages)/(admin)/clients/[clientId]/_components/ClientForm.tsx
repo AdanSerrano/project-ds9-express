@@ -41,6 +41,7 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
         defaultValues: {
             name: '',
             lastname: '',
+            email: '',
             phoneNumber: '',
             ident: ''
         }
@@ -51,6 +52,7 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
             form.reset({
                 name: initialData.name,
                 lastname: initialData.lastname,
+                email: initialData.email,
                 phoneNumber: initialData.phoneNumber,
                 ident: initialData.ident
             });
@@ -158,6 +160,24 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
                                     <FormLabel className='text-white'>Segundo Nombre</FormLabel>
                                     <FormControl>
                                         <Input disabled={isPending} placeholder="Segundo Nombre" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                    <FormLabel className='text-white'>Email</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isPending}
+                                            type='email'
+                                            placeholder="email.doe@example.com"
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
