@@ -25,8 +25,16 @@ export const LoginForm = () => {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
 
+
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
-        setUser(currentUser());
+        const fetchUser = async () => {
+            const userData = currentUser();
+            setUser(userData);
+            setLoading(false);
+        };
+        fetchUser();
     }, []);
 
 
@@ -38,6 +46,9 @@ export const LoginForm = () => {
         },
     });
 
+
+    if (loading) return (<div className="text-white">Loading...</div>);
+
     const onSubmit = (values: z.infer<typeof LoginSchema>) => {
         setError('');
         setSuccess('');
@@ -47,6 +58,7 @@ export const LoginForm = () => {
                 if (response.data.success) {
                     sessionStorage.setItem('token', response.data.token);
                     sessionStorage.setItem('user', JSON.stringify(response.data.userInfo));
+                    router.push(`${response.data.userInfo.role === 'ADMIN' ? '/sales' : '/payments'}`);
                     setSuccess(response.data.success);
                     toast.success(response.data.success);
                 } else {

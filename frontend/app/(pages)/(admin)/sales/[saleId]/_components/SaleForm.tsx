@@ -36,11 +36,13 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     const router = useRouter();
     const params = useParams();
 
+    const [editIndex, setEditIndex] = useState<number | null>(null);
     const [details, setDetails] = useState<SaleDetail[]>([]);
+    const [showProductForm, setShowProductForm] = useState(false);
 
-    const title = initialData ? 'Edit Sale' : 'Create Sale';
-    const description = initialData ? 'Sale updated' : 'Add a new Sale';
-    const action = initialData ? 'Save Change' : 'Create';
+    const title = initialData ? 'Editar Factura' : 'Crear Factura';
+    const description = initialData ? 'Actualizar Factura' : 'Agregar una nueva Factura';
+    const action = initialData ? 'Guardar Cambios de Factura' : 'Crear Factura';
 
     const form = useForm<SaleFormValues>({
         resolver: zodResolver(SaleSchema),
@@ -118,6 +120,25 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
         const newProduct = form.getValues('details')[0];
         setDetails([...details, newProduct]);
         form.reset({ ...form.getValues(), details: [{ product: '', quantity: 0, price: 0, tax: 0, discount: 0 }] });
+        setShowProductForm(false);
+    };
+
+    const handleEdit = (index: number) => {
+        setEditIndex(index);
+        form.reset({ ...form.getValues(), details: [details[index]] });
+    };
+
+    const handleSaveEdit = () => {
+        if (editIndex !== null) {
+            const newDetails = [...details];
+            newDetails[editIndex] = form.getValues('details')[0];
+            setDetails(newDetails);
+            setEditIndex(null);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditIndex(null);
     };
 
     return (
@@ -218,128 +239,246 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                         />
                     </section>
                     <div className='grid grid-cols-1 sm:grid-cols-2 items-center justify-center gap-2'>
-                        <FormField
-                            control={form.control}
-                            name={`details.0.product`}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className='text-white'>Product</FormLabel>
-                                    <FormControl>
-                                        <Input disabled={isPending} placeholder="Product Name" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name={`details.0.quantity`}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className='text-white'>Cantidad</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            disabled={isPending}
-                                            placeholder="Cantidad"
-                                            type="number"
-                                            {...field}
-                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name={`details.0.price`}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className='text-white'>Price</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            disabled={isPending}
-                                            placeholder="Precio"
-                                            type="number"
-                                            {...field}
-                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name={`details.0.tax`}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className='text-white'>Tax</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            disabled={isPending}
-                                            placeholder="Tax"
-                                            type="number"
-                                            {...field}
-                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name={`details.0.discount`}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className='text-white'>Discount</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            disabled={isPending}
-                                            placeholder="Discount"
-                                            type="number"
-                                            {...field}
-                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {showProductForm && (
+                            <>
+                                <FormField
+                                    control={form.control}
+                                    name={`details.0.product`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className='text-white'>Product</FormLabel>
+                                            <FormControl>
+                                                <Input disabled={isPending} placeholder="Product Name" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`details.0.quantity`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className='text-white'>Cantidad</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    disabled={isPending}
+                                                    placeholder="Cantidad"
+                                                    type="number"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`details.0.price`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className='text-white'>Price</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    disabled={isPending}
+                                                    placeholder="Precio"
+                                                    type="number"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`details.0.tax`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className='text-white'>Tax</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    disabled={isPending}
+                                                    placeholder="Tax"
+                                                    type="number"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`details.0.discount`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className='text-white'>Discount</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    disabled={isPending}
+                                                    placeholder="Discount"
+                                                    type="number"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <div>
+                                    <Button
+                                        type="button"
+                                        onClick={addProduct}
+                                        disabled={isPending}
+                                    >
+                                        Save Product
+                                    </Button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {!showProductForm && (
                         <Button
                             type="button"
-                            onClick={addProduct}
+                            onClick={() => setShowProductForm(true)}
+                            disabled={isPending}
                         >
-                            Add Product
+                            Agregar Producto
                         </Button>
-                    </div>
+                    )}
 
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Product</TableHead>
-                                <TableHead>Quantity</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>Tax</TableHead>
-                                <TableHead>Discount</TableHead>
+                                <TableHead>Producto</TableHead>
+                                <TableHead>Cantidad</TableHead>
+                                <TableHead>Precio</TableHead>
+                                <TableHead>ITBMS</TableHead>
+                                <TableHead>DESCUENTO</TableHead>
+                                <TableHead>ACCION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {details.map((detail, index) => (
                                 <TableRow className='text-white' key={index}>
-                                    <TableCell>{detail.product}</TableCell>
-                                    <TableCell>{detail.quantity}</TableCell>
-                                    <TableCell>{detail.price}</TableCell>
-                                    <TableCell>{detail.tax}</TableCell>
-                                    <TableCell>{detail.discount}</TableCell>
+                                    <TableCell className='w-72'>
+                                        {editIndex === index ? (
+                                            <FormControl>
+                                                <Input
+                                                    value={form.watch('details.0.product')}
+                                                    onChange={(e) => form.setValue('details.0.product', e.target.value)}
+                                                />
+                                            </FormControl>
+                                        ) : (
+                                            detail.product
+                                        )}
+                                    </TableCell>
+                                    <TableCell className='w-32'>
+                                        {editIndex === index ? (
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    value={form.watch('details.0.quantity')}
+                                                    onChange={(e) => form.setValue('details.0.quantity', parseFloat(e.target.value))}
+
+                                                />
+                                            </FormControl>
+                                        ) : (
+                                            detail.quantity
+                                        )}
+                                    </TableCell>
+                                    <TableCell className='w-32'>
+                                        {editIndex === index ? (
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    value={form.watch('details.0.price')}
+                                                    onChange={(e) => form.setValue('details.0.price', parseFloat(e.target.value))}
+
+                                                />
+                                            </FormControl>
+                                        ) : (
+                                            detail.price
+                                        )}
+                                    </TableCell>
+                                    <TableCell className='w-32'>
+                                        {editIndex === index ? (
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    value={form.watch('details.0.tax')}
+                                                    onChange={(e) => form.setValue('details.0.tax', parseFloat(e.target.value))}
+
+                                                />
+                                            </FormControl>
+                                        ) : (
+                                            detail.tax
+                                        )}
+                                    </TableCell>
+                                    <TableCell className='w-32'>
+                                        {editIndex === index ? (
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    value={form.watch('details.0.discount')}
+                                                    onChange={(e) => form.setValue('details.0.discount', parseFloat(e.target.value))}
+
+                                                />
+                                            </FormControl>
+                                        ) : (
+                                            detail.discount
+                                        )}
+                                    </TableCell>
+                                    <TableCell >
+                                        {editIndex === index ? (
+                                            <>
+                                                <Button
+                                                    type="button"
+                                                    onClick={handleSaveEdit}
+                                                >
+                                                    Guardar
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    onClick={handleCancelEdit}
+                                                >
+                                                    Cancelar
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => handleEdit(index)}
+                                                >
+                                                    Editar
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newDetails = [...details];
+                                                        newDetails.splice(index, 1);
+                                                        setDetails(newDetails);
+                                                    }}
+                                                >
+                                                    Eliminar
+                                                </Button>
+                                            </>
+                                        )}
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
 
                     <Button className='w-full' type="submit" disabled={isPending}>
-                        Submit Sale
+                        {action}
                     </Button>
                 </form>
             </Form>

@@ -30,9 +30,6 @@ export default function PageLayout({
     return (
         <>
             {children}
-            <div className="bg-white">
-                USER.role: {user?.role || 'No role'}
-            </div>
         </>
     );
 }

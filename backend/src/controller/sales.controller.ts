@@ -23,7 +23,8 @@ class SalesController {
   }
 
   async updateSales(id: string, data: any) {
-    return await this.salesService.updateSales(id, data);
+    const { clientId, saleDate, details } = data;
+    return await this.salesService.updateSales(id, clientId, saleDate, details);
   }
 
   async deleteSalesDetails(id: string) {
