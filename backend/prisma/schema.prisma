@@ -36,6 +36,7 @@ model Client {
   name        String
   lastname    String
   phoneNumber String
+  email       String   @default("david.maloney@utp.ac.pa")
   createdDate DateTime @default(now())
   updatedDate DateTime @updatedAt
   ident       String
@@ -44,6 +45,7 @@ model Client {
 
 model Sale {
   id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceId   Int          @default(0)
   saleDate    DateTime     @default(now())
   createdDate DateTime     @default(now())
   updatedDate DateTime     @updatedAt
@@ -51,15 +53,14 @@ model Sale {
   clients     Client       @relation("ClientToSale", fields: [clientId], references: [id], onDelete: Cascade)
   details     SaleDetail[] @relation("SaleToSaleDetail")
   paymentDetail    Payment[]    @relation("SaleToPayment")
-  Payment     Float
-  TotalSale   Float
+  Payment     Float     @default(0)
+  TotalSale   Float     @default(0)
 
   @@index([clientId])
 }
 
 model SaleDetail {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  invoiceId   Int      
   product     String
   quantity    Int
   price       Float

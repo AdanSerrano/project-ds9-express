@@ -57,7 +57,7 @@ const SaleRouter = (app: Router): Router => {
           error: "Venta no encontrada",
         });
       }
-      res.status(200).json(sale);
+      res.status(200).json(saleFormat(sale));
     } catch (error: unknown) {
       console.log(error)
       res.status(500).json({ error: "Internal server error." });
@@ -171,23 +171,7 @@ const SaleRouter = (app: Router): Router => {
           phoneNumber: sale.clients.phoneNumber,
           ident: sale.clients.ident,
         },
-        details: sale.details.map((detail: any) => {
-          var price_value = detail.quantity * (detail.price - detail.discount);
-          var tax_value = price_value * detail.tax;
-          var total_value = price_value + tax_value;
-
-          return {
-            id: detail.id,
-            quantity: detail.quantity,
-            product: detail.product,
-            price: detail.price,
-            tax: detail.tax,
-            discount: parseFloat(detail.discount.toFixed(2)),
-            price_total: parseFloat(price_value.toFixed(2)),
-            tax_total: parseFloat(tax_value.toFixed(2)),
-            total: parseFloat(total_value.toFixed(2)),
-          };
-        }),
+        details: saleDetailsFormat(sale.details),
       };
     } else {
       return sale.map((sale: any) => {
