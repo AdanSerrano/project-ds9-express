@@ -41,7 +41,7 @@ export const gridItems = [
         imgClassName: "",
         titleClassName: "justify-start",
         img: "",
-        spareImg: "",
+        spareImg: "/b1.svg",
     },
     {
         id: 3,
@@ -50,8 +50,8 @@ export const gridItems = [
         className: "md:col-span-3 md:col-span-3 lg:ol-span-2 lg:col-span-2 md:row-span-1",
         imgClassName: "",
         titleClassName: "justify-center",
-        img: "",
-        spareImg: "",
+        img: "/b1-2.svg",
+        spareImg: "/b4.svg",
     },
     {
         id: 4,

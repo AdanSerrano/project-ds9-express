@@ -55,21 +55,19 @@ export const BentoGridItem = ({
             <div className={`${id === 6 && "flex justify-center"} h-full`}>
                 <div className="absolute">
                     {img && (
-                        <Image
+                        <img
                             src={img}
                             alt={img}
-                            className={cn(imgClassName, "object-cover object-center")}
-                            fill
+                            className={cn(imgClassName, "w-2/4 h-full object-cover object-center mx-auto")}
                         />
                     )}
                 </div>
-                <div className={`absolute -right-20 -bottom-5 ${id === 4 && 'w-full opacity-80'}`}>
+                <div className={`absolute -right-20 -bottom-5  ${id === 4 && 'w-full opacity-80'}`}>
                     {spareImg && (
-                        <Image
+                        <img
                             src={spareImg}
                             alt={spareImg}
                             className={"object-cover object-center w-full h-full"}
-                            fill
                         />
                     )}
                 </div>
