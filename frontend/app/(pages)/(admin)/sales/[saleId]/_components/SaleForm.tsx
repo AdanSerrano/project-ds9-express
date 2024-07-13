@@ -39,6 +39,8 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [details, setDetails] = useState<SaleDetail[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
+    const [clientId, setClientId] = useState<string>('');
+    const [saleDate, setSaleDate] = useState<Date | null>(null);
 
     const title = initialData ? 'Editar Factura' : 'Crear Factura';
     const description = initialData ? 'Actualizar Factura' : 'Agregar una nueva Factura';
@@ -60,21 +62,22 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                 saleDate: new Date(initialData.saleDate),
                 details: []
             });
-            setDetails(initialData.details?.map(detail => ({
-                product: detail.product || '',
-                quantity: Number(detail.quantity),
-                price: Number(detail.price),
-                tax: Number(detail.tax),
-                discount: Number(detail.discount)
-            })) || []);
+            setDetails(initialData.details || []);
+            setClientId(initialData.clientId || '');
+            setSaleDate(new Date(initialData.saleDate));
         }
     }, [initialData, form]);
 
     const onSubmit = (values: SaleFormValues) => {
+        console.log(values)
         setError('');
         startTransition(async () => {
             try {
-                const dataToSubmit = { ...values, details };
+                const dataToSubmit = {
+                    ...values,
+                    details: details,
+                };
+
                 if (initialData) {
                     const response = await axios.put(`${apiUrl}/api/sales/${params.saleId}`, dataToSubmit, {
                         headers: { Authorization: `Bearer ${getToken()}` }
@@ -140,6 +143,16 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     const handleCancelEdit = () => {
         setEditIndex(null);
     };
+
+    const calculateSubtotal = (detail: SaleDetail) => {
+        return ((detail.price || 0) * (detail.quantity || 0)) - (detail.discount || 0);
+    };
+
+    const calculateTotal = (details: SaleDetail[]) => {
+        const ITBMS = details.reduce((acc, detail) => acc + calculateSubtotal(detail) * (detail.tax || 0), 0).toFixed(2);
+        return details.reduce((acc, detail) => acc + calculateSubtotal(detail), 0) + parseFloat(ITBMS);
+    };
+
 
     return (
         <>
@@ -435,7 +448,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                             detail.discount
                                         )}
                                     </TableCell>
-                                    <TableCell >
+                                    <TableCell className='w-fit flex gap-2'>
                                         {editIndex === index ? (
                                             <>
                                                 <Button
@@ -474,6 +487,14 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                     </TableCell>
                                 </TableRow>
                             ))}
+                            <TableRow className='text-white'>
+                                <TableCell colSpan={5} className="text-right">Subtotal</TableCell>
+                                <TableCell className='text-center'>{details.reduce((acc, detail) => acc + calculateSubtotal(detail), 0).toFixed(2)}</TableCell>
+                            </TableRow>
+                            <TableRow className='text-white'>
+                                <TableCell colSpan={5} className="text-right">Total</TableCell>
+                                <TableCell className='text-center'>{calculateTotal(details)}</TableCell>
+                            </TableRow>
                         </TableBody>
                     </Table>
 
