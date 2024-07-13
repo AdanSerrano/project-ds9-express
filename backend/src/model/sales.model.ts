@@ -12,11 +12,7 @@ class SalesModel {
       const sale = await this.database.sale.create({
         data: {
           saleDate: new Date(saleDate),
-          clients: {
-            connect: {
-              id: clientId,
-            },
-          },
+          clientId: clientId,
         },
       });
 
@@ -33,7 +29,6 @@ class SalesModel {
         }),
       });
 
-      return this.findUniqueSales(sale.id);
     } catch (error: unknown) {
       console.log("error createSales");
       console.error(error);
@@ -88,33 +83,39 @@ class SalesModel {
     return sale;
   }
 
-  async updateSales(id: string, data: any): Promise<any> {
+  async updateSales(id: string, clientId: any, saleDate: any, details: any): Promise<any> {
     try {
-      const sale = await this.findUniqueSales(id);
-
-      if (!sale) {
-        return null;
-      }
-
-      const test = await this.database.sale.update({
-        where: {
-          id: id,
-        },
+      const sale = await this.database.sale.update({
+        where: { id },
         data: {
-          saleDate: new Date(data.saleDate),
+          saleDate: new Date(saleDate),
           clients: {
             connect: {
-              id: data.clientId,
+              id: clientId,
             },
           },
         },
       });
 
-      return this.findUniqueSales(id);
+      await this.database.saleDetail.deleteMany({
+        where: { saleId: id },
+      });
+
+      await this.database.saleDetail.createMany({
+        data: details.map((detail: any) => ({
+          quantity: detail.quantity,
+          product: detail.product,
+          price: detail.price,
+          tax: detail.tax,
+          discount: detail.discount,
+          saleId: sale.id,
+        })),
+      });
+
+      return await this.findUniqueSales(sale.id);
     } catch (error: unknown) {
-      console.log("error  MODEL/SALE/UPDATE");
-      console.error(error);
-      return null;
+      console.error("Error updating sales:", error);
+      throw error;
     }
   }
 
@@ -178,7 +179,6 @@ class SalesModel {
         }),
       });
 
-      return this.findUniqueSales(saleId);
     } catch (error: unknown) {
       console.log("error createSalesDetails");
       console.error(error);

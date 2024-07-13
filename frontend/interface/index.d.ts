@@ -9,6 +9,7 @@ export interface Client {
     id?: string;
     name?: string;
     lastname?: string;
+    email?: string;
     phoneNumber?: string;
     ident?: string
     createdAt?: Date | ReactNode;

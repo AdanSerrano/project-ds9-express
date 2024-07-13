@@ -7,6 +7,7 @@ export type ClientsColumns = {
     id?: string;
     name?: string;
     lastname?: string;
+    email?: string;
     phoneNumber?: string;
     ident?: string;
     sales?: number | undefined;
@@ -25,6 +26,10 @@ export const columns: ColumnDef<ClientsColumns>[] = [
     {
         accessorKey: "lastname",
         header: "Segundo Nombre"
+    },
+    {
+        accessorKey: "email",
+        header: "Email"
     },
     {
         accessorKey: "phoneNumber",

@@ -28,7 +28,7 @@ export default function SalesPage() {
         }
         fetchData();
     }, [])
-
+    console.log(sales)
 
     const formattedProducts: SalesColumns[] = sales?.map((item) => ({
         id: item.id,

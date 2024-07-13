@@ -37,6 +37,7 @@ export default function ClientsPage() {
         id: item.id,
         name: item.name,
         lastname: item.lastname,
+        email: item.email,
         phoneNumber: item.phoneNumber,
         ident: item.ident,
         sales: item.sales?.length,

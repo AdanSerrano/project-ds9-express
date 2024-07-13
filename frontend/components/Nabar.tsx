@@ -41,20 +41,20 @@ export const NabarComponent = () => {
                         {!isLoggedin ? (
                             <>
                                 <Link
-                                    href={'/auth/register'}
-                                    className={buttonVariants({
-                                        size: 'sm',
-                                        variant: 'ghost'
-                                    })}>
-                                    Registrarse
-                                </Link>
-                                <Link
                                     href={'/auth/login'}
                                     className={buttonVariants({
                                         size: 'sm',
                                         variant: 'ghost'
                                     })}>
                                     Ingresar
+                                </Link>
+                                <Link
+                                    href={'/auth/register'}
+                                    className={buttonVariants({
+                                        size: 'sm',
+                                        variant: 'ghost'
+                                    })}>
+                                    Registrarse
                                 </Link>
                                 <div className="h-8 w-px bg-white-100 hidden sm:block" />
                                 <Link
@@ -85,6 +85,14 @@ export const NabarComponent = () => {
                                                 variant: 'ghost'
                                             })}>
                                             Facturas
+                                        </Link>
+                                        <Link
+                                            href={'/orders'}
+                                            className={buttonVariants({
+                                                size: 'sm',
+                                                variant: 'ghost'
+                                            })}>
+                                            Ordenes
                                         </Link>
                                     </>
                                 ) : (

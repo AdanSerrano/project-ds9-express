@@ -86,9 +86,9 @@ const SaleRouter = (app: Router): Router => {
   router.put("/:id", verifyTokenMiddleware, async (req, res) => {
     try {
       const { id } = req.params;
+      const { clientId, saleDate, details } = req.body;
 
-      const { clientId, saleDate } = req.body;
-      const sale = await saleController.updateSales(id, { clientId, saleDate });
+      const sale = await saleController.updateSales(id, { clientId, saleDate, details });
 
       res.status(200).json({
         errorMessages: false,
@@ -98,65 +98,6 @@ const SaleRouter = (app: Router): Router => {
     } catch (error: unknown) {
       console.log("ERROR PUT SALE");
       console.error(error);
-      res.status(500).json({ error: "Internal server error." });
-    }
-  });
-
-  router.delete("/details/:id", verifyTokenMiddleware, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const sale = await saleController.deleteSalesDetails(id);
-
-      res.status(200).json({
-        errorMessages: false,
-        success: "Detalle eliminado exitosamente",
-        data: saleFormat(sale),
-      });
-    } catch (error: unknown) {
-      res.status(500).json({ error: "Internal server error." });
-    }
-  });
-
-  router.put("/details/", verifyTokenMiddleware, async (req, res) => {
-    try {
-      const { details, id } = req.body;
-      const sale = await saleController.updateSalesDetails(id, details);
-
-      res.status(200).json({
-        errorMessages: false,
-        success: "Detalle actualizado exitosamente",
-        data: saleFormat(sale),
-      });
-    } catch (error: unknown) {
-      res.status(500).json({ error: "Internal server error." });
-    }
-  });
-
-  router.post("/details/", verifyTokenMiddleware, async (req, res) => {
-    try {
-      const { saleId, details } = req.body;
-      const sale = await saleController.createSalesDetails(saleId, details);
-
-      res.status(200).json({
-        errorMessages: false,
-        success: "Detalle registrado exitosamente",
-        data: saleFormat(sale),
-      });
-    } catch (error: unknown) {
-      res.status(500).json({ error: "Internal server error." });
-    }
-  });
-
-  router.get("/details/:id", verifyTokenMiddleware, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const sale = await saleController.findUniqueSalesDetails(id);
-
-      res.status(200).json({
-        errorMessages: false,
-        data: saleDetailsFormat(sale),
-      });
-    } catch (error: unknown) {
       res.status(500).json({ error: "Internal server error." });
     }
   });
@@ -173,7 +114,23 @@ const SaleRouter = (app: Router): Router => {
           phoneNumber: sale.clients.phoneNumber,
           ident: sale.clients.ident,
         },
-        details: saleDetailsFormat(sale.details),
+        details: sale.details.map((detail: any) => {
+          const price_value = detail.quantity * (detail.price - detail.discount);
+          const tax_value = price_value * detail.tax;
+          const total_value = price_value + tax_value;
+
+          return {
+            id: detail.id,
+            quantity: detail.quantity,
+            product: detail.product,
+            price: detail.price,
+            tax: detail.tax,
+            discount: parseFloat(detail.discount.toFixed(2)),
+            price_total: parseFloat(price_value.toFixed(2)),
+            tax_total: parseFloat(tax_value.toFixed(2)),
+            total: parseFloat(total_value.toFixed(2)),
+          };
+        }),
       };
     } else {
       return sale.map((sale: any) => {
@@ -195,9 +152,9 @@ const SaleRouter = (app: Router): Router => {
 
   function saleDetailsFormat(sale: any) {
     if (!Array.isArray(sale)) {
-      var price_value = sale.quantity * (sale.price - sale.discount);
-      var tax_value = price_value * sale.tax;
-      var total_value = price_value + tax_value;
+      const price_value = sale.quantity * (sale.price - sale.discount);
+      const tax_value = price_value * sale.tax;
+      const total_value = price_value + tax_value;
 
       return {
         id: sale.id,
@@ -212,9 +169,9 @@ const SaleRouter = (app: Router): Router => {
       };
     } else {
       return sale.map((sale: any) => {
-        var price_value = sale.quantity * (sale.price - sale.discount);
-        var tax_value = price_value * sale.tax;
-        var total_value = price_value + tax_value;
+        const price_value = sale.quantity * (sale.price - sale.discount);
+        const tax_value = price_value * sale.tax;
+        const total_value = price_value + tax_value;
 
         return {
           id: sale.id,
