@@ -6,6 +6,7 @@ import { isLoggedIn } from "@/lib/verificationToken";
 import { useEffect } from "react";
 import { navItems } from "@/data";
 import { NabarComponent } from "@/components/Nabar";
+import { MaxWidthWrappper } from "@/components/MaxWidthWrapper";
 
 export default function PageLayout({
   children,
@@ -20,10 +21,10 @@ export default function PageLayout({
   }, [router]);
 
   return (
-    <div className="w-screen overflow-hidden flex items-center flex-col">
+    <>
       <NabarComponent />
       {children}
       <Footer />
-    </div>
+    </>
   );
 }

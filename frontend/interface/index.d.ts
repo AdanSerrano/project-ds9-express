@@ -26,7 +26,7 @@ export interface Sale {
     invoiceId?: number;
     TotalSale?: number;
     Payment?: number;
-    isPaid?: boolean;
+    isPayment?: boolean;
 }
 
 export interface SaleDetail {

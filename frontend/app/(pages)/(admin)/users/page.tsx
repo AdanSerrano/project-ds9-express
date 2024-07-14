@@ -36,7 +36,7 @@ export default function UsersPage() {
     })) || [];
 
     return (
-        <div className="flex-col min-h-screen bg-black h-full w-full">
+        <div className="flex-col min-h-screen h-full w-full">
             <div className="flex-1 space-y-4  p-4 sm:p-8 pt-6">
                 <UsersClient data={formattedProducts} />
             </div>
