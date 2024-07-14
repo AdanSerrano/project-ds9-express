@@ -1,7 +1,108 @@
-import React from 'react'
+'use client'
+import { Sale } from '@/interface'
+import { apiUrl } from '@/lib/api-url'
+import { getToken } from '@/lib/verificationToken'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
+import { formatter } from '@/lib/utils'
+import { format } from 'date-fns'
+import { es } from 'date-fns/locale'
+import { Separator } from '@/components/ui/separator'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Loader2 } from 'lucide-react'
+import { MaxHeigthOrder } from '@/components/MaxHeigthOrder'
+import { toast } from 'sonner'
 
-export default function SalesNotIsPaidById({ params }: { params: { id: string } }) {
+export default function SalesNotIsPaidByID({ params }: { params: { id: string } }) {
+    const [sale, setSale] = useState<Sale | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`${apiUrl}/api/sales/${params.id}`, {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                    },
+                })
+                setSale(response.data)
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData()
+    }, [params.id])
+
+
+    if (loading) {
+        return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>
+    }
+
+    if (error) {
+        return <div className="text-red-500 text-center">{error}</div>
+    }
+
+    if (!sale) {
+        return <div className="text-center">No se encontró la venta</div>
+    }
+
+    const handlePayment = async () => {
+        // Implementar lógica de pago aquí
+        console.log("Procesando pago...")
+        toast.error("No se puede procesar el pago en este momento")
+    }
+
     return (
-        <div>SalesNotIsPaidById</div>
+        <MaxHeigthOrder className="container py-8">
+            <h1 className="text-3xl font-bold mb-6 text-white">Orden de Compra #{sale.id}</h1>
+
+            <div className="bg-gray-100 p-4 rounded-lg mb-6">
+                <p><strong>Cliente:</strong> {sale?.clients?.name}</p>
+                <p><strong>Fecha:</strong> {format(new Date(sale.saleDate), "dd MMMM yyyy", { locale: es })}</p>
+            </div>
+
+            <Table className="w-full mb-6">
+                <TableHeader>
+                    <TableRow className='text-white'>
+                        <TableHead>Producto</TableHead>
+                        <TableHead>Cantidad</TableHead>
+                        <TableHead>Precio</TableHead>
+                        <TableHead>Descuento</TableHead>
+                        <TableHead>Inpuesto</TableHead>
+                        <TableHead>Total</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {sale?.details?.map((detail, index) => (
+                        <TableRow className='text-white' key={index}>
+                            <TableCell>{detail.product}</TableCell>
+                            <TableCell>{detail.quantity}</TableCell>
+                            <TableCell>${detail.price?.toFixed(2)}</TableCell>
+                            <TableCell>${detail.discount?.toFixed(2)}</TableCell>
+                            <TableCell>% {detail.tax}</TableCell>
+                            <TableCell>${((detail.quantity || 0) * (detail.price || 0)).toFixed(2)}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+
+            <div className="flex justify-between items-center">
+                <div className="text-xl font-bold text-white">
+                    Total: ${sale?.TotalSale?.toFixed(2)}
+                </div>
+                <Button
+                    onClick={handlePayment}
+                    disabled={sale?.isPayment}
+                    className="px-6 py-2"
+                >
+                    {sale?.isPayment ? 'Pagado' : 'Pagar'}
+                </Button>
+            </div>
+        </MaxHeigthOrder>
     )
 }

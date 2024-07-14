@@ -1,5 +1,6 @@
 'use client'
 import { BreadCrumb } from '@/components/BreadCrumb'
+import { CardSales } from '@/components/CardSales'
 import { MaxHeigthOrder } from '@/components/MaxHeigthOrder'
 import { Sale } from '@/interface'
 import { apiUrl } from '@/lib/api-url'
@@ -48,14 +49,7 @@ export default function SalesNotIsPaid() {
             </div>
             <div className='grid grid-cols-4 gap-2 items-center justify-center my-10'>
                 {salesNotIsPayment?.map((sale) => (
-                    <div key={sale.id} className="bg-white p-4 rounded-lg shadow-md">
-                        <p>Id: {sale.id}</p>
-                        <p>Cliente: {sale.clients?.name}</p>
-                        <p>Fecha de Venta: {sale.saleDate}</p>
-                        <p>Id de Factura: {sale.invoiceId}</p>
-                        <p>Total de Venta: {sale.TotalSale}</p>
-                        <p>Pagado: {sale.isPayment ? 'Si' : 'No'}</p>
-                    </div>
+                    <CardSales key={sale.id} sale={sale} />
                 ))}
             </div>
         </MaxHeigthOrder>

@@ -1,10 +1,16 @@
 'use client'
 import { BreadCrumb } from '@/components/BreadCrumb'
+import { CardSales } from '@/components/CardSales'
 import { MaxHeigthOrder } from '@/components/MaxHeigthOrder'
+import { buttonVariants } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Sale } from '@/interface'
 import { apiUrl } from '@/lib/api-url'
+import { formatter } from '@/lib/utils'
 import { getToken } from '@/lib/verificationToken'
 import axios from 'axios'
+import Image from 'next/image'
+import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 export default function SalesIsPaid() {
@@ -48,14 +54,7 @@ export default function SalesIsPaid() {
             </div>
             <div className='grid grid-cols-4 gap-2 items-center justify-center my-10'>
                 {salesIsPayment?.map((sale) => (
-                    <div key={sale.id} className="bg-white p-4 rounded-lg shadow-md">
-                        <p>Id: {sale.id}</p>
-                        <p>Cliente: {sale.clients?.name}</p>
-                        <p>Fecha de Venta: {sale.saleDate}</p>
-                        <p>Id de Factura: {sale.invoiceId}</p>
-                        <p>Total de Venta: {sale.TotalSale}</p>
-                        <p>Pagado: {sale.isPayment ? 'Si' : 'No'}</p>
-                    </div>
+                    <CardSales key={sale.id} sale={sale} image={'/Icono factura pagada.avif'} />
                 ))}
             </div>
         </MaxHeigthOrder>
