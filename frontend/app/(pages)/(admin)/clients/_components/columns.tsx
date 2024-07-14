@@ -21,11 +21,10 @@ export const columns: ColumnDef<ClientsColumns>[] = [
     },
     {
         accessorKey: "name",
-        header: "Nombre"
-    },
-    {
-        accessorKey: "lastname",
-        header: "Segundo Nombre"
+        header: "Nombre",
+        cell: ({ row }) => <div className="flex gap-2">
+            <span>{row.original.name}{' '}{row.original.lastname}</span>
+        </div>
     },
     {
         accessorKey: "email",
@@ -33,7 +32,7 @@ export const columns: ColumnDef<ClientsColumns>[] = [
     },
     {
         accessorKey: "phoneNumber",
-        header: "Numero de Telefono"
+        header: "Telefono"
     },
     {
         accessorKey: "ident",

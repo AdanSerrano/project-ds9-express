@@ -21,7 +21,7 @@ export default function SalesPage() {
                         Authorization: `Bearer ${getToken()}`,
                     },
                 });
-                setSales(response.data);
+                setSales(response.data.data);
             } catch (error) {
                 console.log('error fetching data', error)
             }
@@ -32,6 +32,8 @@ export default function SalesPage() {
 
     const formattedProducts: SalesColumns[] = sales?.map((item) => ({
         id: item.id,
+        invoiceId: item.invoiceId,
+        TotalSale: item.TotalSale,
         saleDate: format(new Date(item.saleDate), "MMMM do, yyyy", { locale: es }),
         details: item.details?.length,
         clients: item.clients?.name,

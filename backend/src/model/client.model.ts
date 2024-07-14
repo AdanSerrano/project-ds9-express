@@ -8,7 +8,11 @@ class ClientModel {
   }
 
   async findMany() {
-    return await this.database.client.findMany();
+    return await this.database.client.findMany({
+      include: {
+        sales: true
+      }
+    });
   }
 
   async findUnique(userid: string) {

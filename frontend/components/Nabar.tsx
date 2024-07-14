@@ -71,6 +71,14 @@ export const NabarComponent = () => {
                                 {user?.role === 'ADMIN' ? (
                                     <>
                                         <Link
+                                            href={'/users'}
+                                            className={buttonVariants({
+                                                size: 'sm',
+                                                variant: 'ghost'
+                                            })}>
+                                            Usuarios
+                                        </Link>
+                                        <Link
                                             href={'/clients'}
                                             className={buttonVariants({
                                                 size: 'sm',

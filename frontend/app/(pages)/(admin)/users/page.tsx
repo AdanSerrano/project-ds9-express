@@ -23,7 +23,7 @@ export default function Home() {
                     },
                 });
 
-                setUsers(response.data.users);
+                setUsers(response.data.data);
             } catch (error) {
                 console.log('error fetching data', error);
                 setError('Error fetching data');

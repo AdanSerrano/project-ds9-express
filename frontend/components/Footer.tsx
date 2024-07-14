@@ -8,8 +8,8 @@ export const Footer = () => {
             <div className="flex flex-col-reverse gap-10 md:flex-row items-center justify-between px-10">
 
                 <div className="w-fit">
-                    <p className="text-sm sm:text-base text-center text-gray-400">
-                        Todos los derechos reservados<span className="text-purple-500"> ©{new Date().getFullYear()} Adán Serrano</span>
+                    <p className="text-sm text-center text-gray-400">
+                        Todos los derechos reservados<span className="text-purple-500 font-medium"> ©{new Date().getFullYear()} <span className="text-white">PAY</span>SALES</span>
                     </p>
                 </div>
                 <div className="flex flex-row items-center justify-center gap-3">

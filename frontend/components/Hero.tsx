@@ -25,9 +25,9 @@ export const Hero = () => {
                         words='ADMINISTRA TUS FACTURAS DE MANERA RÁPIDA Y SEGURA'
                     />
 
-                    <a href="#about">
+                    <a href="/payments">
                         <MagicButton
-                            title='Ingresa tu factura'
+                            title='Paga tus factura'
                             icon={<RocketIcon />}
                             position='right'
                         />
