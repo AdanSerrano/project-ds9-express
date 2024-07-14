@@ -62,11 +62,11 @@ const UserRouter = (app: Router): Router => {
     }
   });
 
-  router.get("/:email", verifyTokenMiddleware, async (req, res) => {
+  router.get("/:id", verifyTokenMiddleware, async (req, res) => {
     try {
-      const email = req.params.email;
+      const id = req.params.id;
 
-      const user = await userService.findUnique(email);
+      const user = await userService.findUnique(id);
 
       if (user) {
         res.status(200).json({
@@ -85,12 +85,13 @@ const UserRouter = (app: Router): Router => {
     }
   });
 
-  router.put("/", verifyTokenMiddleware, async (req, res) => {
+  router.put("/:id", verifyTokenMiddleware, async (req, res) => {
     try {
-      const { email, name, role } = req.body;
+      const id = req.params.id;
+      const { email, name, role, password } = req.body;
       const userRole = role ? role : "USER";
 
-      const resp = await userController.updateUser(email, name, userRole);
+      const resp = await userController.updateUser(id, email, name, userRole, password);
 
       if (resp) {
         res.status(200).json({
@@ -135,11 +136,11 @@ const UserRouter = (app: Router): Router => {
     }
   });
 
-  router.delete("/:email", verifyTokenMiddleware, async (req, res) => {
+  router.delete("/:id", verifyTokenMiddleware, async (req, res) => {
     try {
-      const email = req.params.email;
+      const id = req.params.id;
 
-      const resp = await userController.deleteUser(email);
+      const resp = await userController.deleteUser(id);
 
       if (resp) {
         res.status(200).json({

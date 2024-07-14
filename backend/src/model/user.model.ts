@@ -20,10 +20,10 @@ class UserModel {
     });
   }
 
-  async findUnique(email: string) {
+  async findUnique(id: string) {
     return await this.database.user.findUnique({
       where: {
-        email: email,
+        id: id,
       },
     });
   }
@@ -32,14 +32,16 @@ class UserModel {
     return await this.database.user.findMany();
   }
 
-  async updateUser(email: string, inputData: any): Promise<any> {
+  async updateUser(id: string, inputData: any): Promise<any> {
     return await this.database.user.update({
       where: {
-        email: email,
+        id: id,
       },
       data: {
         name: inputData.name,
         role: inputData.role,
+        email: inputData.email,
+        password: inputData.passwordNew
       },
     });
   }
@@ -78,10 +80,10 @@ class UserModel {
     });
   }
 
-  async deleteUser(email: string): Promise<any> {
+  async deleteUser(id: string): Promise<any> {
     return await this.database.user.delete({
       where: {
-        email: email,
+        id: id,
       },
     });
   }
