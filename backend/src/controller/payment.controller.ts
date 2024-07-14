@@ -96,10 +96,18 @@ class PaymentController {
 
   async capturePayment(token: any | undefined) {
     try {
-        console.log(token);
-        console.log(`${String(process.env.PAYPAL_URL).replace('api-m.', 'api.')}/v2/checkout/orders/${token}/capture`);
+      console.log(token);
+      console.log(
+        `${String(process.env.PAYPAL_URL).replace(
+          "api-m.",
+          "api."
+        )}/v2/checkout/orders/${token}/capture`
+      );
       const response = await axios.post(
-        `${String(process.env.PAYPAL_URL).replace('api-m.', 'api.')}/v2/checkout/orders/${token}/capture`,
+        `${String(process.env.PAYPAL_URL).replace(
+          "api-m.",
+          "api."
+        )}/v2/checkout/orders/${token}/capture`,
         {},
         {
           auth: {
@@ -119,6 +127,12 @@ class PaymentController {
     }
 
     return "";
+  }
+
+  async cancelPayment(token: any | undefined) {
+    console.log(token);
+
+    return token;
   }
 
   async findAllPayments() {

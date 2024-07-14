@@ -24,11 +24,11 @@ export const columns: ColumnDef<SalesColumns>[] = [
     },
     {
         accessorKey: "details",
-        header: "details"
+        header: "Cantidad de Productos"
     },
     {
         accessorKey: "saleDate",
-        header: "details"
+        header: "Fecha de Venta"
     },
     {
         accessorKey: "invoiceId",
@@ -37,6 +37,14 @@ export const columns: ColumnDef<SalesColumns>[] = [
     {
         accessorKey: "TotalSale",
         header: "Total de Venta"
+    },
+    {
+        accessorKey: "Payment",
+        header: "Total Pagado"
+    },
+    {
+        accessorKey: "PaymentPending",
+        header: "Por Pagar"
     },
     {
         id: 'actions',

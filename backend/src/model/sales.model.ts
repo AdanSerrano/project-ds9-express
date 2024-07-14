@@ -7,12 +7,47 @@ class SalesModel {
     this.database = databaseInstance;
   }
 
+  async updateTotalSales(saleId: string): Promise<void> {
+    try {
+      const saleDetails = await this.database.saleDetail.findMany({
+        where: { saleId }
+      });
+  
+      const totalSale = saleDetails.reduce((acc, detail) => {
+        const netPrice = detail.price - detail.discount;
+        const taxAmount = netPrice * detail.tax;
+        return acc + (detail.quantity * (netPrice + taxAmount));
+      }, 0);
+  
+      await this.database.sale.update({
+        where: { id: saleId },
+        data: { TotalSale: totalSale }
+      });
+  
+    } catch (error) {
+      console.error('Error updating total sales:', error);
+      throw new Error('Failed to update total sales');
+    }
+  }
+  
+
   async createSales(clientId: any, saleDate: any, details: any): Promise<any> {
     try {
+
+      const maxInvoiceId = await this.database.sale.findFirst({
+        select: {
+          invoiceId: true,
+        },
+        orderBy: {
+          id: "desc",
+        },
+      });
+
       const sale = await this.database.sale.create({
         data: {
           saleDate: new Date(saleDate),
           clientId: clientId,
+          invoiceId: maxInvoiceId ? Number(maxInvoiceId.invoiceId) + 1 : 1,
         },
       });
 
@@ -28,6 +63,8 @@ class SalesModel {
           };
         }),
       });
+
+      //return this.updateTotalSales(sale.id);
 
     } catch (error: unknown) {
       console.log("error createSales");

@@ -28,7 +28,7 @@ const SaleRouter = (app: Router): Router => {
       res.status(201).json({
         errorMessages: false,
         success: "Venta registrada exitosamente",
-        sale
+        sale,
       });
     } catch (error: unknown) {
       res.status(500).json({ error: "Internal server error." });
@@ -88,7 +88,11 @@ const SaleRouter = (app: Router): Router => {
       const { id } = req.params;
       const { clientId, saleDate, details } = req.body;
 
-      const sale = await saleController.updateSales(id, { clientId, saleDate, details });
+      const sale = await saleController.updateSales(id, {
+        clientId,
+        saleDate,
+        details,
+      });
 
       res.status(200).json({
         errorMessages: false,
@@ -107,6 +111,10 @@ const SaleRouter = (app: Router): Router => {
       return {
         id: sale.id,
         saleDate: sale.saleDate,
+        invoiceId: sale.invoiceId,
+        TotalSale: sale.TotalSale,
+        Payment: sale.Payment,
+        PaymentPending: sale.TotalSale - sale.Payment,
         clients: {
           id: sale.clients.id,
           name: sale.clients.name,
@@ -115,7 +123,8 @@ const SaleRouter = (app: Router): Router => {
           ident: sale.clients.ident,
         },
         details: sale.details.map((detail: any) => {
-          const price_value = detail.quantity * (detail.price - detail.discount);
+          const price_value =
+            detail.quantity * (detail.price - detail.discount);
           const tax_value = price_value * detail.tax;
           const total_value = price_value + tax_value;
 
@@ -137,6 +146,10 @@ const SaleRouter = (app: Router): Router => {
         return {
           id: sale.id,
           saleDate: sale.saleDate,
+          invoiceId: sale.invoiceId,
+          TotalSale: sale.TotalSale,
+          Payment: sale.Payment,
+          PaymentPending: sale.TotalSale - sale.Payment,
           clients: {
             id: sale.clients.id,
             name: sale.clients.name,

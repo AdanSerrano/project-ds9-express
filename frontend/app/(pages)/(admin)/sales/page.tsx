@@ -22,6 +22,7 @@ export default function SalesPage() {
                     },
                 });
                 setSales(response.data.data);
+                console.log(response.data.data)
             } catch (error) {
                 console.log('error fetching data', error)
             }
@@ -33,10 +34,12 @@ export default function SalesPage() {
     const formattedProducts: SalesColumns[] = sales?.map((item) => ({
         id: item.id,
         invoiceId: item.invoiceId,
-        TotalSale: item.TotalSale,
-        saleDate: format(new Date(item.saleDate), "MMMM do, yyyy", { locale: es }),
+        TotalSale: Number(item.TotalSale),
+        saleDate: format(new Date(item.saleDate), "dd MMMM yyyy", { locale: es }),
         details: item.details?.length,
         clients: item.clients?.name,
+        Payment: item.Payment,
+        PaymentPending: item.PaymentPending,
     })) || [];
 
     return (

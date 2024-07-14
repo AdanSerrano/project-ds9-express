@@ -24,6 +24,8 @@ export interface Sale {
     clients?: Client;
     invoiceId?: number;
     TotalSale?: number;
+    Payment?: number;
+    PaymentPending?: number;
 }
 
 export interface SaleDetail {

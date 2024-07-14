@@ -29,7 +29,8 @@ class ClientController {
       !inputData.name ||
       !inputData.lastname ||
       !inputData.phoneNumber ||
-      !inputData.ident
+      !inputData.ident ||
+      !inputData.email
     ) {
       throw new Error(
         "Name, Lastname, Phone Number, and Identification are required"
