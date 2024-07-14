@@ -38,6 +38,7 @@ const SaleRouter = (app: Router): Router => {
   router.get("/", verifyTokenMiddleware, async (req, res) => {
     try {
       const sales = await saleController.findAllSales();
+      console.log(sales);
 
       res.status(200).json({
         errorMessages: false,
@@ -62,6 +63,30 @@ const SaleRouter = (app: Router): Router => {
         });
       }
       res.status(200).json(saleFormat(sale));
+    } catch (error: unknown) {
+      console.log(error);
+      res.status(500).json({ error: "Internal server error." });
+    }
+  });
+
+  router.get("/isPayment/:statusPayment", async (req, res) => {
+    try {
+      const { statusPayment } = req.params;
+      const sale = await saleController.findSalesByPayment(
+        Boolean(Number(statusPayment))
+      );
+
+      if (!sale) {
+        res.status(404).json({
+          errorMessages: true,
+          error: "Venta no encontrada",
+        });
+      }
+      res.status(200).json({
+        errorMessages: false,
+        success: "",
+        data: saleFormat(sale),
+      });
     } catch (error: unknown) {
       console.log(error);
       res.status(500).json({ error: "Internal server error." });
@@ -115,6 +140,7 @@ const SaleRouter = (app: Router): Router => {
         TotalSale: sale.TotalSale,
         Payment: sale.Payment,
         PaymentPending: sale.TotalSale - sale.Payment,
+        isPayment: sale.isPayment,
         clients: {
           id: sale.clients.id,
           name: sale.clients.name,
@@ -150,6 +176,7 @@ const SaleRouter = (app: Router): Router => {
           TotalSale: sale.TotalSale,
           Payment: sale.Payment,
           PaymentPending: sale.TotalSale - sale.Payment,
+          isPayment: sale.isPayment,
           clients: {
             id: sale.clients.id,
             name: sale.clients.name,

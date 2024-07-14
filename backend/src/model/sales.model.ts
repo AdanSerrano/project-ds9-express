@@ -190,6 +190,22 @@ class SalesModel {
     return sales;
   }
 
+  async findSalesByPayment(statusPayment: boolean): Promise<any> {
+    const sales = await this.database.sale.findMany({
+      where: {
+        isPayment: statusPayment,
+      },
+      include: {
+        clients: true,
+        details: true,
+      },
+    });
+
+    console.log({sales});
+
+    return sales;
+  }
+
   async deleteSales(id: string): Promise<any> {
     const sale = await this.findUniqueSales(id);
 

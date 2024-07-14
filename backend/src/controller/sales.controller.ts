@@ -42,6 +42,10 @@ class SalesController {
   async findUniqueSalesDetails(id: string) {
     return await this.salesService.findUniqueSalesDetails(id);
   }
+
+  async findSalesByPayment(statusPayment: boolean) {
+    return await this.salesService.findSalesByPayment(statusPayment);
+  }
 }
 
 export default SalesController;

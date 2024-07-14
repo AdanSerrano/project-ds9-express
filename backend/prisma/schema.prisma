@@ -55,6 +55,7 @@ model Sale {
   paymentDetail    Payment[]    @relation("SaleToPayment")
   Payment     Float     @default(0)
   TotalSale   Float     @default(0)
+  isPayment  Boolean @default(false)
 
   @@index([clientId])
 }
