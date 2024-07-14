@@ -95,12 +95,12 @@ export const NabarComponent = () => {
                                             Facturas
                                         </Link>
                                         <Link
-                                            href={'/orders'}
+                                            href={'/dashboard'}
                                             className={buttonVariants({
                                                 size: 'sm',
                                                 variant: 'ghost'
                                             })}>
-                                            Ordenes
+                                            Dashboard
                                         </Link>
                                     </>
                                 ) : (

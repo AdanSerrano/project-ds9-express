@@ -43,7 +43,7 @@ export const CellAction = ({ data }: CellActionProps) => {
                 }
             })
 
-            toast.success("clients deleted successfully")
+            toast.success("clients eliminado satisfactoramente")
             // router.refresh()
             location.reload()
         } catch (error) {
@@ -61,7 +61,7 @@ export const CellAction = ({ data }: CellActionProps) => {
                 onClose={() => setOpen(false)}
                 loading={loading}
                 onConfirm={onDelete}
-                description="Are you sure to delete this clients?"
+                description="Estas Seguro de querer eliminar este clients?"
                 title="Delete clients"
             />
             <DropdownMenu>

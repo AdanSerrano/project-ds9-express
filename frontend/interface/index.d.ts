@@ -2,6 +2,7 @@ export interface User {
     id?: string;
     name?: string;
     email?: string;
+    password?: string;
     role?: string;
 }
 
@@ -25,7 +26,7 @@ export interface Sale {
     invoiceId?: number;
     TotalSale?: number;
     Payment?: number;
-    PaymentPending?: number;
+    isPaid?: boolean;
 }
 
 export interface SaleDetail {

@@ -17,7 +17,6 @@ export default function ClientsPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = sessionStorage.getItem('token');
                 const response = await axios.get(`${apiUrl}/api/clients`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
@@ -45,7 +44,7 @@ export default function ClientsPage() {
 
     return (
         <div className="flex-col min-h-screen bg-black h-full w-full">
-            <div className="flex-1 space-y-4 p-8 pt-6">
+            <div className="flex-1 space-y-4  p-4 sm:p-8 pt-6">
                 <ClientsClient data={formattedProducts} />
             </div>
         </div>

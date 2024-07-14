@@ -103,7 +103,7 @@ export const SaleForm = ({ initialData }: SaleFormProps) => {
             await axios.delete(`${apiUrl}/api/sales/${params.productsId}`);
             router.push(`/sales`);
             router.refresh();
-            toast.success("Sales deleted successfully");
+            toast.success("Sales eliminado satisfactoramente");
         } catch (error) {
             toast.error("Something went wrong");
         } finally {

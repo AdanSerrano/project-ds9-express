@@ -1,7 +1,3 @@
-export const privateRoutes = [
-    '/dashboard'
-]
-
 export const authRoutes = [
     '/login',
     '/register'

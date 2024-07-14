@@ -12,17 +12,19 @@ import { FormError } from '@/components/auth/FormError';
 import { FormSuccess } from '@/components/auth/FormSuccess';
 import { Trash } from 'lucide-react';
 import { Heading } from '@/components/ui/heading';
-import { ClientFormValues, ClientSchema } from '@/schema';
-import { Client } from '@/interface';
+import { RegisterFormValues, RegisterSchema, UserFormValues, UserSchema } from '@/schema';
+import { User } from '@/interface';
 import { apiUrl } from '@/lib/api-url';
 import { AlertModal } from '@/components/modals/alert-modal';
 import { getToken } from '@/lib/verificationToken';
+import { PasswordInput } from '@/components/ui/input-password';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface ClientFormProps {
-    initialData?: Client | null;
+interface UserFormProps {
+    initialData?: User | null;
 }
 
-export const ClientForm = ({ initialData }: ClientFormProps) => {
+export const UserForm = ({ initialData }: UserFormProps) => {
     const [isPending, startTransition] = useTransition();
     const [success, setSuccess] = useState<string | undefined>('');
     const [open, setOpen] = useState(false);
@@ -31,19 +33,18 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
     const router = useRouter();
     const params = useParams();
 
-    const title = initialData ? 'Edit Client' : 'Create Client';
-    const description = initialData ? 'Client updated' : 'Add a new Client';
-    const toastMessage = initialData ? 'Edit a Client' : 'Client Created.';
-    const action = initialData ? 'Save Change' : 'Create';
+    const title = initialData ? 'Editar Usuario' : 'Crear Usuario';
+    const description = initialData ? 'Actualizar Usuario' : 'Agregar nuevo Usuario';
+    const toastMessage = initialData ? 'Usuario Actualizado' : 'Usuario creado.';
+    const action = initialData ? 'Guardar cambios' : 'Crear';
 
-    const form = useForm<ClientFormValues>({
-        resolver: zodResolver(ClientSchema),
+    const form = useForm<RegisterFormValues>({
+        resolver: zodResolver(RegisterSchema),
         defaultValues: {
             name: '',
-            lastname: '',
             email: '',
-            phoneNumber: '',
-            ident: ''
+            password: '',
+            role: '',
         }
     });
 
@@ -51,34 +52,29 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
         if (initialData) {
             form.reset({
                 name: initialData.name,
-                lastname: initialData.lastname,
                 email: initialData.email,
-                phoneNumber: initialData.phoneNumber,
-                ident: initialData.ident
+                password: initialData.password,
+                role: initialData.role
             });
         }
     }, [initialData, form]);
 
 
-    const onSubmit = (values: ClientFormValues) => {
+    const onSubmit = (values: RegisterFormValues) => {
         setError('');
         setSuccess('');
         startTransition(async () => {
             try {
                 if (initialData) {
-                    await axios.put(`${apiUrl}/api/clients/${params.clientId}`, values, {
+                    await axios.put(`${apiUrl}/api/users/${params.userId}`, values, {
                         headers: {
                             Authorization: `Bearer ${getToken()}`
                         }
                     });
                 } else {
-                    await axios.post(`${apiUrl}/api/clients`, values, {
-                        headers: {
-                            Authorization: `Bearer ${getToken()}`
-                        }
-                    });
+                    await axios.post(`${apiUrl}/api/users`, values);
                 }
-                router.push(`/clients`)
+                router.push(`/users`)
                 router.refresh();
                 toast.success(toastMessage);
             } catch (error: unknown) {
@@ -99,14 +95,14 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
 
     const onDelete = async () => {
         try {
-            await axios.delete(`${apiUrl}/api/clients/${params.clientId}`, {
+            await axios.delete(`${apiUrl}/api/users/${params.userId}`, {
                 headers: {
                     Authorization: `Bearer ${getToken()}`
                 }
             });
-            router.push(`/clients`);
+            router.push(`/users`);
             router.refresh();
-            toast.success("Client eliminado satisfactoramente");
+            toast.success("Usuario eliminado satisfactoramente");
         } catch (error) {
             toast.error("Something went wrong");
         } finally {
@@ -154,19 +150,6 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
                         />
                         <FormField
                             control={form.control}
-                            name="lastname"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel className='text-white'>Segundo Nombre</FormLabel>
-                                    <FormControl>
-                                        <Input disabled={isPending} placeholder="Segundo Nombre" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
                             name="email"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
@@ -185,12 +168,12 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
                         />
                         <FormField
                             control={form.control}
-                            name="phoneNumber"
+                            name="password"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                    <FormLabel className='text-white'>Teléfono</FormLabel>
+                                    <FormLabel className='text-white'>Contraseña</FormLabel>
                                     <FormControl>
-                                        <Input disabled={isPending} placeholder="Teléfono" {...field} />
+                                        <PasswordInput disabled={isPending} placeholder="******" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -198,13 +181,33 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
                         />
                         <FormField
                             control={form.control}
-                            name="ident"
+                            name="role"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                    <FormLabel className='text-white'>Identificación</FormLabel>
-                                    <FormControl>
-                                        <Input disabled={isPending} placeholder="Identificación" {...field} />
-                                    </FormControl>
+                                    <FormLabel className='text-white'>Role</FormLabel>
+                                    <Select
+                                        disabled={isPending}
+                                        onValueChange={field.onChange}
+                                        value={field.value}
+                                        defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger defaultValue={field.value}>
+                                                <SelectValue placeholder="Selecciona una cliente" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Cliente</SelectLabel>
+                                                <SelectItem value='USER'>
+                                                    Usuario
+                                                </SelectItem>
+                                                <SelectItem value='ADMIN'>
+                                                    Administrador
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
                                     <FormMessage />
                                 </FormItem>
                             )}

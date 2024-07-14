@@ -2,19 +2,19 @@
 
 import { Check, Copy, Edit, MoreHorizontal, Trash } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 import { AlertModal } from "@/components/modals/alert-modal"
 import { Button } from "@/components/ui/button"
 import axios from "axios"
 import { toast } from "sonner"
 import { useState } from "react"
-import { SalesColumns } from "./columns"
 import { apiUrl } from "@/lib/api-url"
 import { getToken } from "@/lib/verificationToken"
+import { UsersColumns } from "./columns"
 
 interface CellActionProps {
-    data: SalesColumns
+    data: UsersColumns
 }
 
 export const CellAction = ({ data }: CellActionProps) => {
@@ -22,11 +22,10 @@ export const CellAction = ({ data }: CellActionProps) => {
     const [loading, setLoading] = useState(false)
     const [open, setOpen] = useState(false)
     const router = useRouter()
-    const params = useParams()
 
     const onCopy = (description: string) => {
         navigator.clipboard.writeText(description)
-        toast.success('Copied to Sales')
+        toast.success('Usuario Copiado')
         setCopied(true)
         setTimeout(() => {
             setCopied(false)
@@ -36,13 +35,15 @@ export const CellAction = ({ data }: CellActionProps) => {
     const onDelete = async () => {
         try {
             setLoading(true)
-            await axios.delete(`${apiUrl}/api/sales/${data.id}`, {
+            const response = await axios.delete(`${apiUrl}/api/users/${data.id}`, {
                 headers: {
                     Authorization: `Bearer ${getToken()}`
                 }
             })
+
+            toast.success("Usuario eliminado satisfactoramente")
+            // router.refresh()
             location.reload()
-            toast.success("sales eliminado satisfactoramente")
         } catch (error) {
             toast.error("Something went wrong")
         } finally {
@@ -58,8 +59,8 @@ export const CellAction = ({ data }: CellActionProps) => {
                 onClose={() => setOpen(false)}
                 loading={loading}
                 onConfirm={onDelete}
-                description="Estas Seguro de querer eliminar este sales?"
-                title="Delete Sales"
+                description="Estas Seguro de querer eliminar este user?"
+                title="Delete user"
             />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -85,7 +86,7 @@ export const CellAction = ({ data }: CellActionProps) => {
                             </>
                         )}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push(`/sales/${data.id}`)}>
+                    <DropdownMenuItem onClick={() => router.push(`/users/${data.id}`)}>
                         <Edit className="mr-2 h-4 w-4" />
                         Actualizar
                     </DropdownMenuItem>

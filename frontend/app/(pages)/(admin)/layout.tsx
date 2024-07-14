@@ -23,10 +23,6 @@ export default function PageLayout({
 
     if (loading) return (<div className="text-white">Loading...</div>);
 
-    if (user?.role !== 'ADMIN') {
-        notFound() || router.push(`${user?.role === 'ADMIN' ? '/sales' : '/payments'}`);
-    }
-
     return (
         <>
             {children}

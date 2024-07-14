@@ -15,7 +15,6 @@ export default function SalesPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = sessionStorage.getItem('token');
                 const response = await axios.get(`${apiUrl}/api/sales`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
@@ -38,13 +37,12 @@ export default function SalesPage() {
         saleDate: format(new Date(item.saleDate), "dd MMMM yyyy", { locale: es }),
         details: item.details?.length,
         clients: item.clients?.name,
-        Payment: item.Payment,
-        PaymentPending: item.PaymentPending,
+        isPaid: item.isPaid,
     })) || [];
 
     return (
         <div className="flex-col min-h-screen bg-black h-full w-full">
-            <div className="flex-1 space-y-4 p-8 pt-6">
+            <div className="flex-1 space-y-4  p-4 sm:p-8 pt-6">
                 <SalesClient data={formattedProducts} />
             </div>
         </div>
