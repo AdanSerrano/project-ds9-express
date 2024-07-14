@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-
+import { Resend } from "resend";
+const resend = new Resend(process.env.RESEND_API_KEY);
 class SalesModel {
   private database: PrismaClient;
 
@@ -7,39 +8,45 @@ class SalesModel {
     this.database = databaseInstance;
   }
 
+
   async updateTotalSales(saleId: string): Promise<void> {
     try {
       const saleDetails = await this.database.saleDetail.findMany({
         where: { saleId }
       });
-  
+
       const totalSale = saleDetails.reduce((acc, detail) => {
         const netPrice = detail.price - detail.discount;
         const taxAmount = netPrice * detail.tax;
         return acc + (detail.quantity * (netPrice + taxAmount));
       }, 0);
-  
+
       await this.database.sale.update({
         where: { id: saleId },
         data: { TotalSale: totalSale }
       });
-  
+
     } catch (error) {
       console.error('Error updating total sales:', error);
       throw new Error('Failed to update total sales');
     }
   }
-  
+
 
   async createSales(clientId: any, saleDate: any, details: any): Promise<any> {
     try {
-
       const maxInvoiceId = await this.database.sale.findFirst({
         select: {
           invoiceId: true,
         },
         orderBy: {
           id: "desc",
+        },
+      });
+
+      const client = await this.database.client.findUnique({
+        where: {
+          id: clientId,
         },
       });
 
@@ -64,6 +71,13 @@ class SalesModel {
         }),
       });
 
+      await resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: client?.email || '',
+        subject: 'Hello SALfjalsfjlasfj la',
+        html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+      });
+
       //return this.updateTotalSales(sale.id);
 
     } catch (error: unknown) {
@@ -83,6 +97,7 @@ class SalesModel {
         details: true,
       },
     });
+
 
     return sale;
   }
