@@ -7,7 +7,8 @@ export const LoginSchema = z.object({
 export const RegisterSchema = z.object({
     name: z.string().min(2).max(50),
     email: z.string().email(),
-    password: z.string().min(2).max(50)
+    password: z.string().min(2).max(50),
+    role: z.string().optional()
 })
 
 
@@ -37,6 +38,15 @@ export const ClientSchema = z.object({
     ident: z.string().min(1, "Identification is required"),
 });
 
+export const UserSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email(),
+    password: z.string().min(1, "contraseña is required"),
+    role: z.string().min(1, "contraseña is required"),
+});
+
 export type SaleFormValues = z.infer<typeof SaleSchema>;
 export type ClientFormValues = z.infer<typeof ClientSchema>;
+export type UserFormValues = z.infer<typeof UserSchema>;
+export type RegisterFormValues = z.infer<typeof RegisterSchema>;
 

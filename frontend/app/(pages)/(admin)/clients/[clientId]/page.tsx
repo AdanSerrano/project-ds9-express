@@ -15,7 +15,6 @@ export default function SaleIdPage({ params }: { params: { clientId: string } })
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = sessionStorage.getItem('token');
                 const response = await axios.get(`${apiUrl}/api/clients/${params.clientId}`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,

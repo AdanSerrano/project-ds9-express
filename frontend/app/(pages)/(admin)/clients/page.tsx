@@ -17,7 +17,6 @@ export default function ClientsPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = sessionStorage.getItem('token');
                 const response = await axios.get(`${apiUrl}/api/clients`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,

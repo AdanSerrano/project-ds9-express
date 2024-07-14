@@ -15,7 +15,6 @@ export default function SalesPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = sessionStorage.getItem('token');
                 const response = await axios.get(`${apiUrl}/api/sales`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,

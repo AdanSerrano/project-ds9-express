@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormError } from '@/components/auth/FormError'
 import { FormSuccess } from '@/components/auth/FormSuccess'
-import { RegisterSchema } from '@/schema'
+import { RegisterFormValues, RegisterSchema } from '@/schema'
 import axios from 'axios'
 import { PasswordInput } from '../ui/input-password'
 import { apiUrl } from '@/lib/api-url'
@@ -31,7 +31,7 @@ export const RegisterForm = () => {
     const [error, setError] = useState<string | undefined>('');
     const router = useRouter()
 
-    const form = useForm<z.infer<typeof RegisterSchema>>({
+    const form = useForm<RegisterFormValues>({
         resolver: zodResolver(RegisterSchema),
         defaultValues: {
             name: "",
@@ -42,7 +42,7 @@ export const RegisterForm = () => {
 
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof RegisterSchema>) {
+    function onSubmit(values: RegisterFormValues) {
         setError('');
         setSuccess('');
         startTransition(async () => {
