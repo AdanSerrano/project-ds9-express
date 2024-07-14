@@ -1,5 +1,6 @@
 'use client'
 import { BreadCrumb } from '@/components/BreadCrumb'
+import { MaxHeigthOrder } from '@/components/MaxHeigthOrder'
 import { Sale } from '@/interface'
 import { apiUrl } from '@/lib/api-url'
 import { getToken } from '@/lib/verificationToken'
@@ -40,7 +41,7 @@ export default function SalesNotIsPaid() {
     }, [])
 
     return (
-        <section className="mt-10 mb-16 px-2 sm:px-4 max-w-6xl mx-auto">
+        <MaxHeigthOrder className='min-h-[68vh]'>
             <BreadCrumb links={links} />
             <h1 className="text-4xl mt-12 mb-4 font-bold tracking-tight lg:text-5xl text-white-200">Facturas no pagadas</h1>
             <div className="lg:flex justify-between items-center space-y-4 lg:space-y-0">
@@ -57,7 +58,6 @@ export default function SalesNotIsPaid() {
                     </div>
                 ))}
             </div>
-        </section>
-
+        </MaxHeigthOrder>
     )
 }

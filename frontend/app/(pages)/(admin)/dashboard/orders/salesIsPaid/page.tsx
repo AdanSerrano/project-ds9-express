@@ -1,5 +1,6 @@
 'use client'
 import { BreadCrumb } from '@/components/BreadCrumb'
+import { MaxHeigthOrder } from '@/components/MaxHeigthOrder'
 import { Sale } from '@/interface'
 import { apiUrl } from '@/lib/api-url'
 import { getToken } from '@/lib/verificationToken'
@@ -40,28 +41,23 @@ export default function SalesIsPaid() {
     }, [])
 
     return (
-        <div>
-            <main>
-                <section className="mt-10 mb-16 px-2 sm:px-4 max-w-6xl mx-auto">
-                    <BreadCrumb links={links} />
-                    <h1 className="text-4xl mt-12 mb-4 font-bold tracking-tight lg:text-5xl text-white-200">Facturas pagadas</h1>
-                    <div className="lg:flex justify-between items-center space-y-4 lg:space-y-0">
+        <MaxHeigthOrder className='min-h-[68vh]'>
+            <BreadCrumb links={links} />
+            <h1 className="text-4xl mt-12 mb-4 font-bold tracking-tight lg:text-5xl text-white-200">Facturas pagadas</h1>
+            <div className="lg:flex justify-between items-center space-y-4 lg:space-y-0">
+            </div>
+            <div className='grid grid-cols-4 gap-2 items-center justify-center my-10'>
+                {salesIsPayment?.map((sale) => (
+                    <div key={sale.id} className="bg-white p-4 rounded-lg shadow-md">
+                        <p>Id: {sale.id}</p>
+                        <p>Cliente: {sale.clients?.name}</p>
+                        <p>Fecha de Venta: {sale.saleDate}</p>
+                        <p>Id de Factura: {sale.invoiceId}</p>
+                        <p>Total de Venta: {sale.TotalSale}</p>
+                        <p>Pagado: {sale.isPayment ? 'Si' : 'No'}</p>
                     </div>
-                    <div className='grid grid-cols-4 gap-2 items-center justify-center my-10'>
-                        {salesIsPayment?.map((sale) => (
-                            <div key={sale.id} className="bg-white p-4 rounded-lg shadow-md">
-                                <p>Id: {sale.id}</p>
-                                <p>Cliente: {sale.clients?.name}</p>
-                                <p>Fecha de Venta: {sale.saleDate}</p>
-                                <p>Id de Factura: {sale.invoiceId}</p>
-                                <p>Total de Venta: {sale.TotalSale}</p>
-                                <p>Pagado: {sale.isPayment ? 'Si' : 'No'}</p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            </main>
-        </div>
-
+                ))}
+            </div>
+        </MaxHeigthOrder>
     )
 }
