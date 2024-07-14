@@ -24,13 +24,14 @@ class ClientModel {
   }
 
   async createClient(inputData: any) {
-    const { name, lastname, phoneNumber, ident } = inputData;
+    const { name, lastname, phoneNumber, ident, email } = inputData;
     return await this.database.client.create({
       data: {
         name,
         lastname,
         phoneNumber,
         ident,
+        email,
       },
     });
   }
@@ -44,6 +45,7 @@ class ClientModel {
         name: inputData.name,
         lastname: inputData.lastname,
         phoneNumber: inputData.phoneNumber,
+        email: inputData.email,
       },
     });
   }
