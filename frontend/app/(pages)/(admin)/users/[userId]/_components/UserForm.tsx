@@ -12,7 +12,7 @@ import { FormError } from '@/components/auth/FormError';
 import { FormSuccess } from '@/components/auth/FormSuccess';
 import { Trash } from 'lucide-react';
 import { Heading } from '@/components/ui/heading';
-import { UserFormValues, UserSchema } from '@/schema';
+import { RegisterFormValues, RegisterSchema, UserFormValues, UserSchema } from '@/schema';
 import { User } from '@/interface';
 import { apiUrl } from '@/lib/api-url';
 import { AlertModal } from '@/components/modals/alert-modal';
@@ -35,14 +35,15 @@ export const UserForm = ({ initialData }: UserFormProps) => {
 
     const title = initialData ? 'Editar Usuario' : 'Crear Usuario';
     const description = initialData ? 'Actualizar Usuario' : 'Agregar nuevo Usuario';
-    const toastMessage = initialData ? 'Eliminar un Usuario' : 'Usuario creado.';
+    const toastMessage = initialData ? 'Usuario Actualizado' : 'Usuario creado.';
     const action = initialData ? 'Guardar cambios' : 'Crear';
 
-    const form = useForm<UserFormValues>({
-        resolver: zodResolver(UserSchema),
+    const form = useForm<RegisterFormValues>({
+        resolver: zodResolver(RegisterSchema),
         defaultValues: {
             name: '',
             email: '',
+            password: '',
             role: '',
         }
     });
@@ -59,7 +60,7 @@ export const UserForm = ({ initialData }: UserFormProps) => {
     }, [initialData, form]);
 
 
-    const onSubmit = (values: UserFormValues) => {
+    const onSubmit = (values: RegisterFormValues) => {
         setError('');
         setSuccess('');
         startTransition(async () => {
@@ -71,11 +72,7 @@ export const UserForm = ({ initialData }: UserFormProps) => {
                         }
                     });
                 } else {
-                    await axios.post(`${apiUrl}/api/users`, values, {
-                        headers: {
-                            Authorization: `Bearer ${getToken()}`
-                        }
-                    });
+                    await axios.post(`${apiUrl}/api/users`, values);
                 }
                 router.push(`/users`)
                 router.refresh();

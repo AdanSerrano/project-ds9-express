@@ -10,6 +10,7 @@ export type SalesColumns = {
     TotalSale: number | undefined;
     details: number | undefined;
     clients: string | undefined;
+    isPaid: boolean | undefined;
 }
 
 
@@ -39,12 +40,8 @@ export const columns: ColumnDef<SalesColumns>[] = [
         header: "Total de Venta"
     },
     {
-        accessorKey: "Payment",
-        header: "Total Pagado"
-    },
-    {
-        accessorKey: "PaymentPending",
-        header: "Por Pagar"
+        accessorKey: "isPaid",
+        header: "Pagado"
     },
     {
         id: 'actions',
