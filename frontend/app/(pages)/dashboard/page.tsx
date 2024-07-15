@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react'
 import { Separator } from '@/components/ui/separator'
 import { formatter } from '@/lib/utils'
 import { Client, Sale, User } from '@/interface'
-import { getToken } from '@/lib/verificationToken'
+import { currentUser, getToken } from '@/lib/verificationToken'
 import axios from 'axios'
 import { apiUrl } from '@/lib/api-url'
 import { MaxWidthWrappper } from '@/components/MaxWidthWrapper'
@@ -24,10 +24,18 @@ export default function OrdersPage({ params }: DashboardPageProps) {
     const [sales, setSales] = useState<Sale[] | null>([])
     const [salesIsPayment, setSalesIsPayment] = useState<Sale[] | null>([])
     const [salesNotIsPayment, setSalesNotIsPayment] = useState<Sale[] | null>([])
-    const [user, setUsers] = useState<User[] | null>([])
+    const [users, setUsers] = useState<User[] | null>([])
+    const [user, setUser] = useState<User | null>(null);
     const [clients, setClients] = useState<Client[] | null>([])
     const router = useRouter()
 
+    useEffect(() => {
+        setUser(currentUser());
+    }, []);
+
+    if (user?.role === 'USER') {
+        router.push('/dashboard/orders')
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,6 +52,7 @@ export default function OrdersPage({ params }: DashboardPageProps) {
         }
         fetchData();
     }, [])
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -125,7 +134,7 @@ export default function OrdersPage({ params }: DashboardPageProps) {
                         </CardHeader>
                         <CardContent>
                             <div className='text-2xl font-bold '>
-                                {user?.length}
+                                {users?.length}
                             </div>
                         </CardContent>
                     </Card>

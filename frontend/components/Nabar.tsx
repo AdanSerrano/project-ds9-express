@@ -105,12 +105,12 @@ export const NabarComponent = () => {
                                     </>
                                 ) : (
                                     <Link
-                                        href={'/payments'}
+                                        href={'/dashboard/orders'}
                                         className={buttonVariants({
                                             size: 'sm',
                                             variant: 'ghost'
                                         })}>
-                                        Pagar Factura
+                                        Facturas
                                     </Link>
                                 )}
                                 <div className="h-8 w-px bg-white-100 hidden sm:block" />
