@@ -76,7 +76,7 @@ export default function PaidInvoice({ params }: { params: { id: string } }) {
                         <DollarSign className="mr-2 text-green-400" />
                         <div>
                             <p className="text-sm text-gray-400">Fecha de pago</p>
-                            <p className="font-semibold">{sale.payment?.createdAt ? format(new Date(sale.payment?.createdAt), "dd MMMM yyyy", { locale: es }) : 'No disponible'}</p>
+                            <p className="font-semibold">{sale.paymentDate ? format(new Date(sale.paymentDate), "dd MMMM yyyy", { locale: es }) : 'No disponible'}</p>
                         </div>
                     </div>
                 </div>
