@@ -37,11 +37,11 @@ export default function SalesPage() {
         saleDate: format(new Date(item.saleDate), "dd MMMM yyyy", { locale: es }),
         details: item.details?.length,
         clients: item.clients?.name,
-        isPaid: item.isPaid,
+        isPayment: item.isPayment,
     })) || [];
 
     return (
-        <div className="flex-col min-h-screen bg-black h-full w-full">
+        <div className="flex-col min-h-[80vh] h-full w-full">
             <div className="flex-1 space-y-4  p-4 sm:p-8 pt-6">
                 <SalesClient data={formattedProducts} />
             </div>

@@ -47,7 +47,7 @@ export const RegisterForm = () => {
         setSuccess('');
         startTransition(async () => {
             try {
-                const response = await axios.post(`${apiUrl}/api/users`, values);
+                const response = await axios.post(`${apiUrl}/api/users/register`, values);
                 setUsers([...users, response.data]);
                 setNewUser(response.data);
                 if (response.data.success) {

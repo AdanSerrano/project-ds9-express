@@ -14,7 +14,42 @@ const UserRouter = (app: Router): Router => {
   const verificationService = new VerificationService();
   const userController = new UserController(userService, verificationService);
 
-  router.post("/", async (req, res) => {
+  router.post("/register", async (req, res) => {
+    try {
+      const { name, email, password, role } = req.body;
+
+      const resp = await userController.register(
+        name,
+        email,
+        password,
+        role ? role : Role.USER
+      );
+
+      if (resp) {
+        res.status(201).json({
+          errorMessages: false,
+          success: "Usuario registrado exitosamente",
+          data: {
+            id: resp.id,
+            name: resp.name,
+            email: resp.email,
+            role: resp.role,
+          },
+        });
+      } else {
+        res.status(400).json({
+          errorMessages: true,
+          error: "Este usuario ya existe",
+        });
+      }
+    } catch (error: unknown) {
+      console.log(error)
+      res.status(500).json({ error: "Internal server error." });
+    }
+  });
+
+  // Ruta /users con verificación de token
+  router.post("/", verifyTokenMiddleware, async (req, res) => {
     try {
       const { name, email, password, role } = req.body;
 

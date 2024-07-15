@@ -72,7 +72,11 @@ export const UserForm = ({ initialData }: UserFormProps) => {
                         }
                     });
                 } else {
-                    await axios.post(`${apiUrl}/api/users`, values);
+                    await axios.post(`${apiUrl}/api/users`, values, {
+                        headers: {
+                            Authorization: `Bearer ${getToken()}`
+                        }
+                    });
                 }
                 router.push(`/users`)
                 router.refresh();

@@ -1,13 +1,12 @@
+// payment.router.ts
 import { Router } from "express";
-import verifyTokenMiddleware from "../../middleware/jwtToken";
-import VerificationService from "../../model/services/verification.services";
-import PaymentModel from "../../model/payment.model";
-import DatabaseService from "../../model/services/database.services";
 import PaymentController from "../../controller/payment.controller";
+import DatabaseService from "../../model/services/database.services";
+import PaymentModel from "../../model/payment.model";
+import VerificationService from "../../model/services/verification.services";
 
 const PaymentRouter = (app: Router): Router => {
   const router = Router();
-
   const databaseService = DatabaseService.getInstance();
   const paymentService = new PaymentModel(databaseService);
   const verificationService = new VerificationService();
@@ -19,64 +18,52 @@ const PaymentRouter = (app: Router): Router => {
   router.post("/", async (req, res) => {
     try {
       const { clientId, saleId, paymentDate, amount } = req.body;
+      const order = await paymentController.createPayment(clientId, saleId, paymentDate, amount);
+      res.json(order);
 
-      const payment = await paymentController.createPayment(
-        clientId,
-        saleId,
-        paymentDate,
-        amount
-      );
-
-      res.status(201).json({
-        errorMessages: false,
-        success: "Venta registrada exitosamente",
-        data: {
-          payment,
-        },
-      });
-    } catch (error: unknown) {
-      res.status(500).json({ error: "Internal server error." });
-      console.error(error);
+      // res.status(201).json({
+      //   errorMessages: false,
+      //   success: "Venta registrada exitosamente",
+      //   data: {
+      //     payment,
+      //   },
+      // });
+    } catch (error) {
+      res.status(500).json({ error: "Error creating PayPal order" });
     }
   });
 
   router.get("/captureOrder", async (req, res) => {
     try {
       const { token } = req.query;
-
-      console.log({ token });
-
-      const payment = await paymentController.capturePayment(token);
-      res.status(200).json({
-        errorMessages: false,
-        success: "Venta registrada exitosamente",
-        data: {
-          payment,
-        },
-      });
-    } catch (error: unknown) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error." });
+      const captureData = await paymentController.capturePayment(token as string);
+      res.json(captureData);
+      // res.status(200).json({
+      //   errorMessages: false,
+      //   success: "Venta registrada exitosamente",
+      //   data: {
+      //     payment,
+      //   },
+      // });
+    } catch (error) {
+      res.status(500).json({ error: "Error capturing PayPal payment" });
     }
   });
 
-  router.get("/cancelOrder", async (req, res) => {
+  router.get("/cancelPayment", async (req, res) => {
     try {
       const { token } = req.query;
-
-      console.log({ token });
-
-      const payment = await paymentController.cancelPayment(token);
-      res.status(200).json({
-        errorMessages: false,
-        success: "Venta registrada exitosamente",
-        data: {
-          payment,
-        },
-      });
-    } catch (error: unknown) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error." });
+      const cancelData = await paymentController.cancelPayment(token as string);
+      res.json(cancelData);
+      // res.status(200).json({
+      //   errorMessages: false,
+      //   success: "Venta registrada exitosamente",
+      //   data: {
+      //     payment,
+      //   },
+      // });
+    } catch (error) {
+      res.status(500).json({ error: "Error cancelling PayPal payment" });
     }
   });
 

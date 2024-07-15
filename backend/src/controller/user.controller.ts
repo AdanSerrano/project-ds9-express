@@ -12,7 +12,7 @@ class UserController {
       throw new Error("Name, email, and password are required.");
     }
 
-    const existingUser = await this.userService.findUnique(email);
+    const existingUser = await this.userService.findUserByEmail(email);
 
     if (existingUser) {
       return;

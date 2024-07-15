@@ -38,7 +38,6 @@ const SaleRouter = (app: Router): Router => {
   router.get("/", verifyTokenMiddleware, async (req, res) => {
     try {
       const sales = await saleController.findAllSales();
-      console.log(sales);
 
       res.status(200).json({
         errorMessages: false,
@@ -62,7 +61,7 @@ const SaleRouter = (app: Router): Router => {
           error: "Venta no encontrada",
         });
       }
-      res.status(200).json(saleFormat(sale));
+      res.status(200).json(sale);
     } catch (error: unknown) {
       console.log(error);
       res.status(500).json({ error: "Internal server error." });
@@ -85,7 +84,7 @@ const SaleRouter = (app: Router): Router => {
       res.status(200).json({
         errorMessages: false,
         success: "",
-        data: saleFormat(sale),
+        data: sale,
       });
     } catch (error: unknown) {
       console.log(error);
