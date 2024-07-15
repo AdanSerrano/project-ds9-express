@@ -67,6 +67,24 @@ export default function SalesNotIsPaidByID({ params }: { params: { id: string } 
         });
         console.log('Payment captured:', response.data);
         toast.success("Pago realizado con éxito");
+
+        fetchData()
+    };
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${apiUrl}/api/sales/${params.id}`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+            setSale(response.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            setError('Error fetching data');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (loading) {
