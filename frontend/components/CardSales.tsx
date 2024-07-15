@@ -9,13 +9,15 @@ import Link from 'next/link'
 interface CardSalesProps {
     sale: Sale
     image?: string
+    href?: string
+    isPaid?: boolean
 }
 
-export const CardSales = ({ sale, image }: CardSalesProps) => {
+export const CardSales = ({ sale, image, href, isPaid }: CardSalesProps) => {
     return (
         <Card key={sale.id} >
             <CardHeader>
-                <Link href={`/dashboard/orders/salesIsPaid/${sale.id}`} className="mx-auto z-10 rounded-xl relative flex flex-col justify-center items-center h-full sm:h-44 w-full ">
+                <Link href={`${href}/${sale.id}`} className="mx-auto z-10 rounded-xl relative flex flex-col justify-center items-center h-full sm:h-36 w-full ">
                     <Image
                         src={image || '/default.jpg'}
                         width={400}
@@ -27,18 +29,17 @@ export const CardSales = ({ sale, image }: CardSalesProps) => {
             </CardHeader>
             <CardContent className="p-4">
                 <div className="my-2">
-                    <p className="text-sm text-gray-600">{sale.clients?.name} - {sale.clients?.email}</p>
+                    <p className="text-sm text-gray-600">{sale.clients?.name}</p>
+                    <p className="text-xs text-gray-400">{sale.clients?.email}</p>
                 </div>
-                <div className="mt-4 grid grid-cols-2 justify-between items-center gap-x-2">
-                    <p className="text-xs text-gray-600">Total Sale: ${sale.TotalSale?.toFixed(2)}</p>
-                    <p className="text-xs text-gray-600">Invoice ID: {sale.invoiceId}</p>
-                    <p className="text-xs text-gray-600">Sale Date: {new Date(sale.saleDate).toLocaleDateString()}</p>
-                    <p className="text-xs text-gray-600">Productos: {sale.details?.length}</p>
+                <div className="mt-4">
+                    <p className="text-xs text-gray-600 flex items-center justify-between">Total de Factura: <span>${sale.TotalSale?.toFixed(2)}</span></p>
+                    <p className="text-xs text-gray-600 flex items-center justify-between">Sale Date: <span>{new Date(sale.saleDate).toLocaleDateString()}</span></p>
                 </div>
             </CardContent>
             <CardFooter className="flex w-full gap-2 justify-center items-center overflow-hidden">
                 <Link
-                    href={`/dashboard/orders/salesIsPaid/${sale.id}`}
+                    href={`${isPaid ? '/dashboard/orders/salesIsPaid' : '/dashboard/orders/salesNotIsPaid'}/${sale.id}`}
                     className={buttonVariants({
                         variant: 'default',
                         className: 'w-full'

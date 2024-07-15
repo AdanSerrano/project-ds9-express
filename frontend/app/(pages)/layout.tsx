@@ -13,12 +13,6 @@ export default function PageLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter()
-  useEffect(() => {
-    if (!isLoggedIn()) {
-      router.push('/auth/login');
-    }
-  }, [router]);
 
   return (
     <>

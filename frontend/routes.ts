@@ -1,3 +1,11 @@
+export const privateRoutes = [
+    '/dashboard',
+    '/dashboard/orders',
+    '/dashboard/orders/salesNotIsPaid',
+    '/dashboard/orders/salesIsPaid',
+]
+
+
 export const authRoutes = [
     '/login',
     '/register'

@@ -8,50 +8,81 @@ class SalesModel {
     this.database = databaseInstance;
   }
 
-  async updateTotalSales(saleId: string): Promise<void> {
-    try {
-      const saleDetails = await this.database.saleDetail.findMany({
-        where: { saleId },
-      });
+  // async updateTotalSales(saleId: string): Promise<void> {
+  //   try {
+  //     const saleDetails = await this.database.saleDetail.findMany({
+  //       where: { saleId },
+  //     });
 
-      const totalSale = saleDetails.reduce((acc, detail) => {
-        const netPrice = detail.price - detail.discount;
-        const taxAmount = netPrice * detail.tax;
-        return acc + detail.quantity * (netPrice + taxAmount);
-      }, 0);
+  //     // Calculation Functions
+  //     const calculateSubtotal = (detail: any) => {
+  //       const price = detail.price || 0;
+  //       const quantity = detail.quantity || 0;
+  //       const discount = detail.discount || 0;
+  //       return (price * quantity) - discount;
+  //     };
 
-      await this.database.sale.update({
-        where: { id: saleId },
-        data: { TotalSale: totalSale },
-      });
-    } catch (error) {
-      console.error("Error updating total sales:", error);
-      throw new Error("Failed to update total sales");
-    }
-  }
+  //     const calculateITBMS = (detail: any) => {
+  //       const taxRate = (detail.tax || 0) / 100;
+  //       return calculateSubtotal(detail) * taxRate;
+  //     };
+
+  //     const calculateTotal = (details: any[]) => {
+  //       const subtotal = details.reduce((acc, detail) => acc + calculateSubtotal(detail), 0);
+  //       const totalITBMS = details.reduce((acc, detail) => acc + calculateITBMS(detail), 0);
+  //       return subtotal + totalITBMS;
+  //     };
+
+  //     const totalSale = calculateTotal(saleDetails);
+
+  //     await this.database.sale.update({
+  //       where: { id: saleId },
+  //       data: { TotalSale: totalSale },
+  //     });
+  //   } catch (error) {
+  //     console.error("Error updating total sales:", error);
+  //     throw new Error("Failed to update total sales");
+  //   }
+  // }
 
   async createSales(clientId: any, saleDate: any, details: any): Promise<any> {
     try {
       const maxInvoiceId = await this.database.sale.findFirst({
-        select: {
-          invoiceId: true,
-        },
-        orderBy: {
-          id: "desc",
-        },
+        select: { invoiceId: true },
+        orderBy: { id: "desc" },
       });
 
       const client = await this.database.client.findUnique({
-        where: {
-          id: clientId,
-        },
+        where: { id: clientId },
       });
+
+      // Calculation Functions
+      const calculateSubtotal = (detail: any) => {
+        const price = detail.price || 0;
+        const quantity = detail.quantity || 0;
+        const discount = detail.discount || 0;
+        return (price * quantity) - discount;
+      };
+
+      const calculateITBMS = (detail: any) => {
+        const taxRate = (detail.tax || 0) / 100;
+        return calculateSubtotal(detail) * taxRate;
+      };
+
+      const calculateTotal = (details: any[]) => {
+        const subtotal = details.reduce((acc, detail) => acc + calculateSubtotal(detail), 0);
+        const totalITBMS = details.reduce((acc, detail) => acc + calculateITBMS(detail), 0);
+        return subtotal + totalITBMS;
+      };
+
+      const totalSale = calculateTotal(details);
 
       const sale = await this.database.sale.create({
         data: {
           saleDate: new Date(saleDate),
           clientId: clientId,
           invoiceId: maxInvoiceId ? Number(maxInvoiceId.invoiceId) + 1 : 1,
+          TotalSale: totalSale,
         },
       });
 
@@ -157,7 +188,7 @@ class SalesModel {
 </html>`,
       });
 
-      //return this.updateTotalSales(sale.id);
+      return sale;
     } catch (error: unknown) {
       console.log("error createSales");
       console.error(error);
@@ -201,7 +232,7 @@ class SalesModel {
       },
     });
 
-    console.log({sales});
+    console.log({ sales });
 
     return sales;
   }
@@ -262,6 +293,31 @@ class SalesModel {
         })),
       });
 
+      const calculateSubtotal = (detail: any) => {
+        const price = detail.price || 0;
+        const quantity = detail.quantity || 0;
+        const discount = detail.discount || 0;
+        return (price * quantity) - discount;
+      };
+
+      const calculateITBMS = (detail: any) => {
+        const taxRate = (detail.tax || 0) / 100;
+        return calculateSubtotal(detail) * taxRate;
+      };
+
+      const calculateTotal = (details: any[]) => {
+        const subtotal = details.reduce((acc, detail) => acc + calculateSubtotal(detail), 0);
+        const totalITBMS = details.reduce((acc, detail) => acc + calculateITBMS(detail), 0);
+        return subtotal + totalITBMS;
+      };
+
+      const totalSale = calculateTotal(details);
+
+      await this.database.sale.update({
+        where: { id: sale.id },
+        data: { TotalSale: totalSale },
+      });
+
       return await this.findUniqueSales(sale.id);
     } catch (error: unknown) {
       console.error("Error updating sales:", error);
@@ -269,81 +325,82 @@ class SalesModel {
     }
   }
 
-  async deleteSalesDetails(id: string): Promise<any> {
-    const saleDetail = await this.database.saleDetail.findUnique({
-      where: {
-        id: id,
-      },
-    });
 
-    if (!saleDetail) {
-      return null;
-    }
+  // async deleteSalesDetails(id: string): Promise<any> {
+  //   const saleDetail = await this.database.saleDetail.findUnique({
+  //     where: {
+  //       id: id,
+  //     },
+  //   });
 
-    await this.database.saleDetail.delete({
-      where: {
-        id: id,
-      },
-    });
+  //   if (!saleDetail) {
+  //     return null;
+  //   }
 
-    return saleDetail;
-  }
+  //   await this.database.saleDetail.delete({
+  //     where: {
+  //       id: id,
+  //     },
+  //   });
 
-  async updateSalesDetails(id: string, data: any): Promise<any> {
-    const saleDetail = await this.database.saleDetail.findUnique({
-      where: {
-        id: id,
-      },
-    });
+  //   return saleDetail;
+  // }
 
-    if (!saleDetail) {
-      return null;
-    }
+  // async updateSalesDetails(id: string, data: any): Promise<any> {
+  //   const saleDetail = await this.database.saleDetail.findUnique({
+  //     where: {
+  //       id: id,
+  //     },
+  //   });
 
-    await this.database.saleDetail.update({
-      where: {
-        id: id,
-      },
-      data: {
-        quantity: data.quantity,
-        product: data.product,
-        price: data.price,
-        tax: data.tax,
-        discount: data.discount,
-      },
-    });
-  }
+  //   if (!saleDetail) {
+  //     return null;
+  //   }
 
-  async createSalesDetails(saleId: any, details: any): Promise<any> {
-    try {
-      await this.database.saleDetail.createMany({
-        data: details.map((detail: any) => {
-          return {
-            quantity: detail.quantity,
-            product: detail.product,
-            price: detail.price,
-            tax: detail.tax,
-            discount: detail.discount,
-            saleId: saleId,
-          };
-        }),
-      });
-    } catch (error: unknown) {
-      console.log("error createSalesDetails");
-      console.error(error);
-      return null;
-    }
-  }
+  //   await this.database.saleDetail.update({
+  //     where: {
+  //       id: id,
+  //     },
+  //     data: {
+  //       quantity: data.quantity,
+  //       product: data.product,
+  //       price: data.price,
+  //       tax: data.tax,
+  //       discount: data.discount,
+  //     },
+  //   });
+  // }
 
-  async findUniqueSalesDetails(id: string): Promise<any> {
-    const saleDetail = await this.database.saleDetail.findUnique({
-      where: {
-        id: id,
-      },
-    });
+  // async createSalesDetails(saleId: any, details: any): Promise<any> {
+  //   try {
+  //     await this.database.saleDetail.createMany({
+  //       data: details.map((detail: any) => {
+  //         return {
+  //           quantity: detail.quantity,
+  //           product: detail.product,
+  //           price: detail.price,
+  //           tax: detail.tax,
+  //           discount: detail.discount,
+  //           saleId: saleId,
+  //         };
+  //       }),
+  //     });
+  //   } catch (error: unknown) {
+  //     console.log("error createSalesDetails");
+  //     console.error(error);
+  //     return null;
+  //   }
+  // }
 
-    return saleDetail;
-  }
+  // async findUniqueSalesDetails(id: string): Promise<any> {
+  //   const saleDetail = await this.database.saleDetail.findUnique({
+  //     where: {
+  //       id: id,
+  //     },
+  //   });
+
+  //   return saleDetail;
+  // }
 }
 
 export default SalesModel;

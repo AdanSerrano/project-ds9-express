@@ -85,7 +85,7 @@ const SaleRouter = (app: Router): Router => {
       res.status(200).json({
         errorMessages: false,
         success: "",
-        data: saleFormat(sale),
+        data: sale,
       });
     } catch (error: unknown) {
       console.log(error);

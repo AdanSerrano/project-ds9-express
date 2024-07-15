@@ -65,16 +65,16 @@ export default function OrdersPage() {
             </div>
             <div className='my-10'>
                 <h2 className='text-white'>Facturas Pagadas</h2>
-                <div className='grid grid-cols-4 gap-2 items-center justify-center my-10'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 items-center justify-center my-10'>
                     {salesIsPayment?.map((sale) => (
-                        <CardSales key={sale.id} sale={sale} image={'/Icono factura pagada.avif'} />
+                        <CardSales isPaid href='/dashboard/orders/salesIsPaid' key={sale.id} sale={sale} image={'/Icono factura pagada.avif'} />
                     ))}
                 </div>
 
                 <h2 className='text-white'>Facturas No Pagadas</h2>
-                <div className='grid grid-cols-4 gap-2 items-center justify-center my-10'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 items-center justify-center my-10'>
                     {salesNotIsPayment?.map((sale) => (
-                        <CardSales key={sale.id} sale={sale} />
+                        <CardSales href='/dashboard/orders/salesNotIsPaid' isPaid={false} key={sale.id} sale={sale} />
                     ))}
                 </div>
             </div>

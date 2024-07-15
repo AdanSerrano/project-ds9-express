@@ -23,11 +23,7 @@ export default function PaidInvoice({ params }: { params: { id: string } }) {
                         Authorization: `Bearer ${getToken()}`,
                     },
                 })
-                if (!response.data.isPayment) {
-                    setError("Esta factura no está pagada")
-                } else {
-                    setSale(response.data)
-                }
+                setSale(response.data)
             } catch (error) {
                 console.error("Error fetching data:", error);
                 setError("Error al cargar los datos de la factura")
@@ -40,10 +36,6 @@ export default function PaidInvoice({ params }: { params: { id: string } }) {
 
     if (loading) {
         return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>
-    }
-
-    if (error) {
-        return <div className="text-red-500 text-center">{error}</div>
     }
 
     if (!sale) {
