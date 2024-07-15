@@ -1,8 +1,8 @@
 export const privateRoutes = [
-    '/dashboard',
-    '/dashboard/orders',
-    '/dashboard/orders/salesNotIsPaid',
-    '/dashboard/orders/salesIsPaid',
+    // '/dashboard',
+    // '/dashboard/orders',
+    // '/dashboard/orders/salesNotIsPaid',
+    // '/dashboard/orders/salesIsPaid',
 ]
 
 

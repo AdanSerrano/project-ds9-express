@@ -1,7 +1,7 @@
-require("dotenv").config();
-const paypal = require("../model/services/paypal.services");
 import axios from "axios";
-import { log } from "console";
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 class PaymentController {
   private paymentService: any;
@@ -38,14 +38,22 @@ class PaymentController {
     amount: number
   ) {
     try {
-      const saleInfo = await axios.get(
-        `${process.env.PAYPAL_URL_API_LOCAL}/sales/${saleId}`
-      );
+      // const saleInfo = await axios.get(
+      //   `${process.env.PAYPAL_URL_API_LOCAL}/sales/${saleId}`
+      // );
 
-      let total = 0;
-      saleInfo.data.details.forEach((detail: any) => {
-        total += detail.total;
+      // let total = 0;
+      // saleInfo.data.details.forEach((detail: any) => {
+      //   total += detail.total;
+      // });
+      const sale = await prisma.sale.findUnique({
+        where: { id: saleId },
+        include: { details: true }
       });
+
+      if (!sale) {
+        throw new Error("Sale not found");
+      }
 
       const order = {
         intent: "CAPTURE",
@@ -53,7 +61,7 @@ class PaymentController {
           {
             amount: {
               currency_code: "USD",
-              value: parseFloat(total.toFixed(2)),
+              value: sale.TotalSale.toFixed(2),
             },
           },
         ],
@@ -68,9 +76,6 @@ class PaymentController {
 
       const access_token = await this.createToken();
 
-      console.log({ access_token });
-
-      // make a request
       const response = await axios.post(
         `${process.env.PAYPAL_URL}/v2/checkout/orders`,
         order,
@@ -81,33 +86,26 @@ class PaymentController {
         }
       );
 
-      console.log(response.data);
-    } catch (error) {
-      console.log(error);
-    }
+      // Create a new payment record in the database
+      const payment = await prisma.payment.create({
+        data: {
+          saleId: saleId,
+          amount: sale.TotalSale,
+          status: "pending",
+        }
+      });
 
-    return this.paymentService.createPayment(
-      clientId,
-      saleId,
-      paymentDate,
-      amount
-    );
+      return response.data;
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      throw error;
+    }
   }
 
-  async capturePayment(token: any | undefined) {
+  async capturePayment(token: string) {
     try {
-      console.log(token);
-      console.log(
-        `${String(process.env.PAYPAL_URL).replace(
-          "api-m.",
-          "api."
-        )}/v2/checkout/orders/${token}/capture`
-      );
       const response = await axios.post(
-        `${String(process.env.PAYPAL_URL).replace(
-          "api-m.",
-          "api."
-        )}/v2/checkout/orders/${token}/capture`,
+        `${process.env.PAYPAL_URL}/v2/checkout/orders/${token}/capture`,
         {},
         {
           auth: {
@@ -117,30 +115,60 @@ class PaymentController {
         }
       );
 
-      console.log(response.data);
+      // Update the payment status in the database
+      const paymentDetails = response.data.purchase_units[0].payments.captures[0];
+      const updatedPayment = await prisma.payment.update({
+        where: { id: paymentDetails.id },
+        data: {
+          status: "completed",
+          amount: parseFloat(paymentDetails.amount.value),
+        }
+      });
 
-      //res.redirect("/payed.html");
-    } catch (error: unknown) {
-      console.log("error en capturePayment");
-      console.log(error);
-      //return res.status(500).json({ message: "Internal Server error" });
+      // Update the sale to mark it as paid
+      await prisma.sale.update({
+        where: { id: updatedPayment.saleId },
+        data: { isPayment: true, Payment: updatedPayment.amount }
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error capturing payment:", error);
+      throw error;
     }
-
-    return "";
   }
 
-  async cancelPayment(token: any | undefined) {
-    console.log(token);
+  async cancelPayment(token: string) {
+    try {
+      // You might want to implement cancellation logic here
+      // For now, we'll just update the payment status to "cancelled"
+      const payment = await prisma.payment.findFirst({
+        where: { status: "pending" },
+        orderBy: { createdAt: 'desc' }
+      });
 
-    return token;
+      if (payment) {
+        await prisma.payment.update({
+          where: { id: payment.id },
+          data: { status: "cancelled" }
+        });
+      }
+
+      return { message: "Payment cancelled", token };
+    } catch (error) {
+      console.error("Error cancelling payment:", error);
+      throw error;
+    }
   }
 
   async findAllPayments() {
-    return this.paymentService.findAllPayments();
+    return prisma.payment.findMany();
   }
 
   async getOnePayment(id: string) {
-    return this.paymentService.getOnePayment(id);
+    return prisma.payment.findUnique({
+      where: { id }
+    });
   }
 }
 

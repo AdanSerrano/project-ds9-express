@@ -1,24 +1,25 @@
 'use client'
-import { Sale } from '@/interface'
-import { apiUrl } from '@/lib/api-url'
-import { getToken } from '@/lib/verificationToken'
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
-import { formatter } from '@/lib/utils'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
-import { Separator } from '@/components/ui/separator'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
-import { MaxHeigthOrder } from '@/components/MaxHeigthOrder'
-import { toast } from 'sonner'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
+import { Sale } from '@/interface';
+import { apiUrl } from '@/lib/api-url';
+import { getToken } from '@/lib/verificationToken';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { formatter } from '@/lib/utils';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import { MaxHeigthOrder } from '@/components/MaxHeigthOrder';
+import { toast } from 'sonner';
 
 export default function SalesNotIsPaidByID({ params }: { params: { id: string } }) {
-    const [sale, setSale] = useState<Sale | null>(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+    const [sale, setSale] = useState<Sale | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -27,34 +28,62 @@ export default function SalesNotIsPaidByID({ params }: { params: { id: string } 
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
                     },
-                })
-                setSale(response.data)
+                });
+                setSale(response.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
+                setError('Error fetching data');
             } finally {
                 setLoading(false);
             }
-        }
-        fetchData()
-    }, [params.id])
+        };
+        fetchData();
+    }, [params.id]);
 
+    const createOrder = async () => {
+        try {
+            const response = await axios.post(`${apiUrl}/api/payments`, {
+                clientId: sale?.clients?.id,
+                saleId: sale?.id,
+                paymentDate: new Date(),
+                amount: sale?.TotalSale,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+            return response.data.id;
+        } catch (error) {
+            console.error('Error creating order:', error);
+            throw error;
+        }
+    };
+
+    const onApprove = async (data: any) => {
+        try {
+            const response = await axios.get(`${apiUrl}/api/payments/captureOrder?token=${data.orderID}`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+            console.log('Payment captured:', response.data);
+            toast.success("Pago realizado con éxito");
+        } catch (error) {
+            console.error('Error capturing payment:', error);
+            toast.error("Error procesando el pago");
+        }
+    };
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>
+        return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>;
     }
 
     if (error) {
-        return <div className="text-red-500 text-center">{error}</div>
+        return <div className="text-red-500 text-center">{error}</div>;
     }
 
     if (!sale) {
-        return <div className="text-center">No se encontró la venta</div>
-    }
-
-    const handlePayment = async () => {
-        // Implementar lógica de pago aquí
-        console.log("Procesando pago...")
-        toast.error("No se puede procesar el pago en este momento")
+        return <div className="text-center">No se encontró la venta</div>;
     }
 
     return (
@@ -91,18 +120,31 @@ export default function SalesNotIsPaidByID({ params }: { params: { id: string } 
                 </TableBody>
             </Table>
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center my-10">
                 <div className="text-xl font-bold text-white">
                     Total: ${sale?.TotalSale?.toFixed(2)}
                 </div>
-                <Button
-                    onClick={handlePayment}
-                    disabled={sale?.isPayment}
-                    className="px-6 py-2"
-                >
-                    {sale?.isPayment ? 'Pagado' : 'Pagar'}
-                </Button>
+            </div>
+            <div className='w-full flex items-center justify-center'>
+                {!sale?.isPayment && (
+                    <PayPalScriptProvider options={{ "clientId": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "" }}>
+                        <PayPalButtons
+                            className='w-1/2'
+                            createOrder={createOrder}
+                            onApprove={onApprove}
+                            onError={(err) => {
+                                console.error(err);
+                                toast.error("Error procesando el pago");
+                            }}
+                        />
+                    </PayPalScriptProvider>
+                )}
+                {sale?.isPayment && (
+                    <Button disabled className="px-6 py-2">
+                        Pagado
+                    </Button>
+                )}
             </div>
         </MaxHeigthOrder>
-    )
+    );
 }
