@@ -39,6 +39,8 @@ const SaleRouter = (app: Router): Router => {
     try {
       const sales = await saleController.findAllSales();
 
+      totalSalePaymentByMonth(saleFormat(sales))
+
       res.status(200).json({
         errorMessages: false,
         error: "",
@@ -130,6 +132,17 @@ const SaleRouter = (app: Router): Router => {
     }
   });
 
+  function maxDatePayment(payment: any) {
+    let maxDate = new Date('1990-01-01');
+    payment.forEach((pay: any) => {
+      if (new Date(pay.createdAt) > maxDate && pay.status === "completed") {
+        maxDate = new Date(pay.createdAt);
+      }
+    });
+
+    return maxDate;
+  }
+
   function saleFormat(sale: any) {
     if (!Array.isArray(sale)) {
       return {
@@ -140,6 +153,8 @@ const SaleRouter = (app: Router): Router => {
         Payment: sale.Payment,
         PaymentPending: sale.TotalSale - sale.Payment,
         isPayment: sale.isPayment,
+        paymentDetails: sale.paymentDetail,
+        paymentDate: maxDatePayment(sale.paymentDetail),
         clients: {
           id: sale.clients.id,
           name: sale.clients.name,
@@ -176,6 +191,8 @@ const SaleRouter = (app: Router): Router => {
           Payment: sale.Payment,
           PaymentPending: sale.TotalSale - sale.Payment,
           isPayment: sale.isPayment,
+          paymentDetails: sale.paymentDetail,
+          paymentDate: maxDatePayment(sale.paymentDetail),
           clients: {
             id: sale.clients.id,
             name: sale.clients.name,
@@ -225,6 +242,27 @@ const SaleRouter = (app: Router): Router => {
         };
       });
     }
+  }
+
+  function totalSalePaymentByMonth(sales: any) {
+    // se debe agrupar el total de ventas realizadas por año y mes por el campo saleDate con el formato yyyy-MMM.
+    
+    const totalSalesByMonth = sales.reduce((acc: any, sale: any) => {
+      const month = new Date(sale.saleDate).toLocaleString("es-PA", {
+        month: "long",
+      });
+      const year = new Date(sale.saleDate).getFullYear();
+      const key = `${year}-${month}`;
+
+      if (!acc[key]) {
+        acc[key] = 0;
+      }
+
+      acc[key] += sale.TotalSale;
+
+      return acc;
+    } , {});
+
   }
 
   return router;
