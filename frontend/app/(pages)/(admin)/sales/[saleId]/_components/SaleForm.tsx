@@ -28,7 +28,7 @@ interface SaleFormProps {
     clients?: Client[] | null;
 }
 
-export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
+export const SaleForm: React.FC<SaleFormProps> = ({ initialData, clients }) => {
     const [isPending, startTransition] = useTransition();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -37,8 +37,15 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     const params = useParams();
 
     const [editIndex, setEditIndex] = useState<number | null>(null);
-    const [details, setDetails] = useState<SaleDetail[]>([]);
+    const [details, setDetails] = useState<SaleDetail[]>(initialData?.details || []);
     const [showProductForm, setShowProductForm] = useState(false);
+    const [newProduct, setNewProduct] = useState<SaleDetail>({
+        product: '',
+        quantity: 0,
+        price: 0,
+        tax: 0,
+        discount: 0
+    });
 
     const title = initialData ? 'Editar Factura' : 'Crear Factura';
     const description = initialData ? 'Actualizar Factura' : 'Agregar una nueva Factura';
@@ -115,15 +122,20 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     };
 
     const addProduct = () => {
-        const newProduct = form.getValues('details')[0];
         setDetails([...details, newProduct]);
-        form.reset({ ...form.getValues(), details: [{ product: '', quantity: 0, price: 0, tax: 0, discount: 0 }] });
+        setNewProduct({
+            product: '',
+            quantity: 0,
+            price: 0,
+            tax: 0,
+            discount: 0
+        });
         setShowProductForm(false);
     };
 
     const handleEdit = (index: number) => {
         setEditIndex(index);
-        form.reset({ ...form.getValues(), details: [details[index]] });
+        form.setValue('details', [details[index]]);
     };
 
     const handleSaveEdit = () => {
@@ -139,7 +151,6 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
         setEditIndex(null);
     };
 
-
     const calculateSubtotal = (detail: SaleDetail) => {
         const price = detail.price || 0;
         const quantity = detail.quantity || 0;
@@ -148,7 +159,7 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
     };
 
     const calculateITBMS = (detail: SaleDetail) => {
-        const taxRate = (detail.tax || 0) / 100; // Convertir porcentaje a decimal
+        const taxRate = (detail.tax || 0) / 100;
         return calculateSubtotal(detail) * taxRate;
     };
 
@@ -259,21 +270,24 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                         {showProductForm && (
                             <>
                                 <FormField
-                                    control={form.control}
-                                    name={`details.0.product`}
+                                    name="newProduct.product"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className='text-white'>Product</FormLabel>
                                             <FormControl>
-                                                <Input disabled={isPending} placeholder="Product Name" {...field} />
+                                                <Input
+                                                    disabled={isPending}
+                                                    placeholder="Product Name"
+                                                    value={newProduct.product}
+                                                    onChange={(e) => setNewProduct({ ...newProduct, product: e.target.value })}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                                 <FormField
-                                    control={form.control}
-                                    name={`details.0.quantity`}
+                                    name="newProduct.quantity"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className='text-white'>Cantidad</FormLabel>
@@ -282,8 +296,8 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                                     disabled={isPending}
                                                     placeholder="Cantidad"
                                                     type="number"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                    value={newProduct.quantity}
+                                                    onChange={(e) => setNewProduct({ ...newProduct, quantity: parseFloat(e.target.value) })}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -301,8 +315,8 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                                     disabled={isPending}
                                                     placeholder="Precio"
                                                     type="number"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                    value={newProduct.price}
+                                                    onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -320,8 +334,8 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                                     disabled={isPending}
                                                     placeholder="ITBMS"
                                                     type="number"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                    value={newProduct.tax}
+                                                    onChange={(e) => setNewProduct({ ...newProduct, tax: parseFloat(e.target.value) })}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -339,8 +353,8 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                                                     disabled={isPending}
                                                     placeholder="Discount"
                                                     type="number"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                    value={newProduct.discount}
+                                                    onChange={(e) => setNewProduct({ ...newProduct, discount: parseFloat(e.target.value) })}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -359,6 +373,8 @@ export const SaleForm = ({ initialData, clients }: SaleFormProps) => {
                             </>
                         )}
                     </div>
+
+
 
                     {!showProductForm && (
                         <Button

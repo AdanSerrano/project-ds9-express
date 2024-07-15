@@ -25,8 +25,8 @@ export interface Sale {
     clients?: Client;
     invoiceId?: number;
     TotalSale?: number;
-    Payment?: number;
     isPayment?: boolean;
+    payment?: Payment;
 }
 
 export interface SaleDetail {
@@ -37,6 +37,15 @@ export interface SaleDetail {
     tax?: number;
     discount?: number;
     saleId?: string;
+    sale?: Sale;
+}
+
+export interface Payment {
+    id?: string;
+    saleId?: string;
+    amount?: number;
+    status?: string;
+    createdAt?: Date | ReactNode;
     sale?: Sale;
 }
 

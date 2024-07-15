@@ -28,6 +28,14 @@ class UserModel {
     });
   }
 
+  async findUserByEmail(email: string) {
+    return await this.database.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+  }
+
   async findAllUsers(): Promise<any> {
     return await this.database.user.findMany();
   }

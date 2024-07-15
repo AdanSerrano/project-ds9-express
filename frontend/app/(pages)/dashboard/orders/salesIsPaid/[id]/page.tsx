@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Calendar, DollarSign, User, Package } from 'lucide-react'
 import { MaxHeigthOrder } from '@/components/MaxHeigthOrder'
 
 export default function PaidInvoice({ params }: { params: { id: string } }) {
@@ -35,53 +35,85 @@ export default function PaidInvoice({ params }: { params: { id: string } }) {
     }, [params.id])
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>
+        return <div className="flex justify-center items-center h-screen">
+            <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+        </div>
     }
 
     if (!sale) {
-        return <div className="text-center">No se encontró la factura</div>
+        return <div className="text-center text-red-500 text-xl">No se encontró la factura</div>
     }
 
     return (
-        <MaxHeigthOrder className="container py-8">
-            <h1 className="text-3xl font-bold mb-6 text-white">Factura Pagada #{sale.id}</h1>
-
-            <div className="bg-gray-100 p-4 rounded-lg mb-6">
-                <p><strong>Cliente:</strong> {sale?.clients?.name}</p>
-                <p><strong>Fecha de venta:</strong> {format(new Date(sale.saleDate), "dd MMMM yyyy", { locale: es })}</p>
-                <p><strong>Fecha de pago:</strong> {sale.Payment ? format(new Date(sale.Payment), "dd MMMM yyyy", { locale: es }) : 'No disponible'}</p>
+        <MaxHeigthOrder className="container py-8 px-4 sm:px-6 lg:px-8">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-6 mb-8">
+                <h1 className="text-4xl font-bold mb-2 text-white">Factura Pagada #{sale.id}</h1>
+                <div className="flex flex-wrap items-center text-gray-200">
+                    <User className="mr-2" />
+                    <span className="mr-4">{sale?.clients?.name}</span>
+                    <Calendar className="mr-2" />
+                    <span>{format(new Date(sale.saleDate), "dd MMMM yyyy", { locale: es })}</span>
+                </div>
             </div>
 
-            <Table className="w-full mb-6">
-                <TableHeader>
-                    <TableRow className='text-white'>
-                        <TableHead>Producto</TableHead>
-                        <TableHead>Cantidad</TableHead>
-                        <TableHead>Precio</TableHead>
-                        <TableHead>Descuento</TableHead>
-                        <TableHead>Impuesto</TableHead>
-                        <TableHead>Total</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {sale?.details?.map((detail, index) => (
-                        <TableRow className='text-white' key={index}>
-                            <TableCell>{detail.product}</TableCell>
-                            <TableCell>{detail.quantity}</TableCell>
-                            <TableCell>${detail.price?.toFixed(2)}</TableCell>
-                            <TableCell>${detail.discount?.toFixed(2)}</TableCell>
-                            <TableCell>% {detail.tax}</TableCell>
-                            <TableCell>${((detail.quantity || 0) * (detail.price || 0)).toFixed(2)}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+            <div className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg p-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
+                    <div className="flex items-center">
+                        <User className="mr-2 text-blue-400" />
+                        <div>
+                            <p className="text-sm text-gray-400">Cliente</p>
+                            <p className="font-semibold">{sale?.clients?.name}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center">
+                        <Calendar className="mr-2 text-purple-400" />
+                        <div>
+                            <p className="text-sm text-gray-400">Fecha de venta</p>
+                            <p className="font-semibold">{format(new Date(sale.saleDate), "dd MMMM yyyy", { locale: es })}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center">
+                        <DollarSign className="mr-2 text-green-400" />
+                        <div>
+                            <p className="text-sm text-gray-400">Fecha de pago</p>
+                            <p className="font-semibold">{sale.payment?.createdAt ? format(new Date(sale.payment?.createdAt), "dd MMMM yyyy", { locale: es }) : 'No disponible'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <div className="flex justify-between items-center">
-                <div className="text-xl font-bold text-white">
+            <div className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden mb-8">
+                <Table>
+                    <TableHeader>
+                        <TableRow className="bg-gray-800 text-gray-200">
+                            <TableHead>Producto</TableHead>
+                            <TableHead>Cantidad</TableHead>
+                            <TableHead>Precio</TableHead>
+                            <TableHead>Descuento</TableHead>
+                            <TableHead>Impuesto</TableHead>
+                            <TableHead>Total</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {sale?.details?.map((detail, index) => (
+                            <TableRow key={index} className="text-gray-300 hover:bg-gray-700 transition-colors">
+                                <TableCell className="font-medium">{detail.product}</TableCell>
+                                <TableCell>{detail.quantity}</TableCell>
+                                <TableCell>${detail.price?.toFixed(2)}</TableCell>
+                                <TableCell>${detail.discount?.toFixed(2)}</TableCell>
+                                <TableCell>% {detail.tax}</TableCell>
+                                <TableCell>${((detail.quantity || 0) * (detail.price || 0)).toFixed(2)}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-between items-center bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg p-6">
+                <div className="text-2xl font-bold text-white mb-4 sm:mb-0">
                     Total Pagado: ${sale?.TotalSale?.toFixed(2)}
                 </div>
-                <div className="px-6 py-2 bg-green-500 text-white rounded">
+                <div className="px-6 py-2 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full font-semibold shadow-lg">
                     Pagado
                 </div>
             </div>

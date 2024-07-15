@@ -86,7 +86,6 @@ class PaymentController {
         }
       );
 
-      // Create a new payment record in the database
       const payment = await prisma.payment.create({
         data: {
           saleId: saleId,
@@ -115,17 +114,25 @@ class PaymentController {
         }
       );
 
-      // Update the payment status in the database
       const paymentDetails = response.data.purchase_units[0].payments.captures[0];
+
+      const pendingPayment = await prisma.payment.findFirst({
+        where: { status: "pending" },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (!pendingPayment) {
+        throw new Error("No pending payment found");
+      }
+
       const updatedPayment = await prisma.payment.update({
-        where: { id: paymentDetails.id },
+        where: { id: pendingPayment.id },
         data: {
           status: "completed",
           amount: parseFloat(paymentDetails.amount.value),
         }
       });
 
-      // Update the sale to mark it as paid
       await prisma.sale.update({
         where: { id: updatedPayment.saleId },
         data: { isPayment: true, Payment: updatedPayment.amount }

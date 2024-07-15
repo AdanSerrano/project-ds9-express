@@ -6,9 +6,9 @@ export async function middleware(req: any) {
 
 
     const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-    const isPrivateRoute = privateRoutes.includes(nextUrl.pathname)
     const isAuthRoute = authRoutes.includes(nextUrl.pathname)
 
+    // const isPrivateRoute = privateRoutes.includes(nextUrl.pathname)
 
     if (isApiAuthRoute) {
         return undefined;
@@ -19,10 +19,10 @@ export async function middleware(req: any) {
         return Response.redirect(redirectUrl);
     }
 
-    if (isPrivateRoute) {
-        const redirectUrl = new URL("/auth/login", nextUrl);
-        return Response.redirect(redirectUrl)
-    }
+    // if (isPrivateRoute) {
+    //     const redirectUrl = new URL("/auth/login", nextUrl);
+    //     return Response.redirect(redirectUrl)
+    // }
 
     return undefined;
 

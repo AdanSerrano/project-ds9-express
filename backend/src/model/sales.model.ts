@@ -204,6 +204,7 @@ class SalesModel {
       include: {
         clients: true,
         details: true,
+        paymentDetail: true
       },
     });
 
@@ -215,6 +216,7 @@ class SalesModel {
       include: {
         clients: true,
         details: true,
+        paymentDetail: true
       },
     });
 
@@ -231,8 +233,6 @@ class SalesModel {
         details: true,
       },
     });
-
-    console.log({ sales });
 
     return sales;
   }
