@@ -58,7 +58,7 @@ export const LoginForm = () => {
                 if (response.data.success) {
                     sessionStorage.setItem('token', response.data.token);
                     sessionStorage.setItem('user', JSON.stringify(response.data.userInfo));
-                    router.push(`${response.data.userInfo.role === 'ADMIN' ? '/sales' : '/payments'}`);
+                    router.push(`${response.data.userInfo.role === 'ADMIN' ? '/users' : '/dashboard/orders'}`);
                     setSuccess(response.data.success);
                     toast.success(response.data.success);
                 } else {
