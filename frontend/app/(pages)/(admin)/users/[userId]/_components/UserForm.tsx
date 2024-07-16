@@ -36,7 +36,7 @@ export const UserForm = ({ initialData }: UserFormProps) => {
     const title = initialData ? 'Editar Usuario' : 'Crear Usuario';
     const description = initialData ? 'Actualizar Usuario' : 'Agregar nuevo Usuario';
     const toastMessage = initialData ? 'Usuario Actualizado' : 'Usuario creado.';
-    const action = initialData ? 'Guardar cambios' : 'Crear';
+    const action = initialData ? 'Guardar cambios' : 'Crear Usuario';
 
     const form = useForm<UserFormValues>({
         resolver: zodResolver(UserSchema),
@@ -223,7 +223,7 @@ export const UserForm = ({ initialData }: UserFormProps) => {
                     <FormError message={error} />
                     <FormSuccess message={success} />
                     <Button className='w-full' type="submit" disabled={isPending}>
-                        Submit Client
+                        {action}
                     </Button>
                 </form>
             </Form>

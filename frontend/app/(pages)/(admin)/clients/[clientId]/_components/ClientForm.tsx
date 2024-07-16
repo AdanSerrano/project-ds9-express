@@ -31,10 +31,10 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
     const router = useRouter();
     const params = useParams();
 
-    const title = initialData ? 'Edit Client' : 'Create Client';
-    const description = initialData ? 'Client updated' : 'Add a new Client';
-    const toastMessage = initialData ? 'Edit a Client' : 'Client Created.';
-    const action = initialData ? 'Save Change' : 'Create';
+    const title = initialData ? 'Editar Cliente' : 'Create Cliente';
+    const description = initialData ? 'Actualizar Cliente' : 'Agregar un nuevo Cliente';
+    const toastMessage = initialData ? 'Editar a Cliente' : 'Cliente Creado.';
+    const action = initialData ? 'Guardar cambios' : 'Cliente Creado';
 
     const form = useForm<ClientFormValues>({
         resolver: zodResolver(ClientSchema),
@@ -213,7 +213,7 @@ export const ClientForm = ({ initialData }: ClientFormProps) => {
                     <FormError message={error} />
                     <FormSuccess message={success} />
                     <Button className='w-full' type="submit" disabled={isPending}>
-                        Submit Client
+                        {action}
                     </Button>
                 </form>
             </Form>

@@ -55,7 +55,7 @@ export const SaleForm: React.FC<SaleFormProps> = ({ initialData, clients }) => {
         resolver: zodResolver(SaleSchema),
         defaultValues: {
             clientId: '',
-            saleDate: new Date(),
+            saleDate: undefined,
             details: [],
         },
     });

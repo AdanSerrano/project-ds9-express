@@ -68,6 +68,10 @@ class SalesModel {
         return calculateSubtotal(detail) * taxRate;
       };
 
+      const calculateTotalPerProduct = (detail: any) => {
+        return calculateSubtotal(detail) + calculateITBMS(detail);
+      };
+
       const calculateTotal = (details: any[]) => {
         const subtotal = details.reduce((acc, detail) => acc + calculateSubtotal(detail), 0);
         const totalITBMS = details.reduce((acc, detail) => acc + calculateITBMS(detail), 0);
@@ -110,9 +114,7 @@ class SalesModel {
 
       console.log(saleByid)
 
-      const subtotal = totalSale;
-      const itbms = totalSale * 0.07;
-      const total = subtotal + itbms;
+
 
       await resend.emails.send({
         from: "onboarding@resend.dev",
@@ -168,6 +170,9 @@ class SalesModel {
                   <th>Producto</th>
                   <th>Cantidad</th>
                   <th>Precio</th>
+                  <th>Itbms</th>
+                  <th>Subtotal</th>
+                  <th>Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -176,22 +181,18 @@ class SalesModel {
                   <td>${detail.product}</td>
                   <td>${detail.quantity}</td>
                   <td>$${detail.price.toFixed(2)}</td>
+                  <td>%${detail.tax}</td>
+                  <td>$${calculateSubtotal(detail).toFixed(2)}</td>
+                  <td>$${calculateTotalPerProduct(detail).toFixed(2)}</td>
                 </tr>
               `).join("")}
                 <tr class="total-row">
                   <td></td>
-                  <td>Subtotal</td>
-                  <td>$${subtotal.toFixed(2)}</td>
-                </tr>
-                <tr class="total-row">
-                <td></td>
-                  <td>ITBMS</td>
-                  <td>$${itbms.toFixed(2)}</td>
-                </tr>
-                <tr class="total-row">
-                <td></td>
-                  <td><strong>Total</strong></td>
-                  <td><strong>$${total.toFixed(2)}</strong></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>Total</td>
+                  <td>$${saleByid?.TotalSale.toFixed(2)}</td>
                 </tr>
               </tbody>
             </table>
