@@ -123,10 +123,10 @@ const UserRouter = (app: Router): Router => {
   router.put("/:id", verifyTokenMiddleware, async (req, res) => {
     try {
       const id = req.params.id;
-      const { email, name, role, password } = req.body;
+      const { email, name, role } = req.body;
       const userRole = role ? role : "USER";
 
-      const resp = await userController.updateUser(id, email, name, userRole, password);
+      const resp = await userController.updateUser(id, email, name, userRole);
 
       if (resp) {
         res.status(200).json({

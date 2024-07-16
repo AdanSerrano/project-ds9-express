@@ -10,7 +10,7 @@ export type SalesColumns = {
     TotalSale: number | undefined;
     details: number | undefined;
     clients: string | undefined;
-    isPayment: boolean | undefined;
+    isPayment: string | undefined;
 }
 
 

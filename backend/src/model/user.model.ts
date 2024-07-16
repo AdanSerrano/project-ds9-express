@@ -48,8 +48,7 @@ class UserModel {
       data: {
         name: inputData.name,
         role: inputData.role,
-        email: inputData.email,
-        password: inputData.passwordNew
+        email: inputData.email
       },
     });
   }

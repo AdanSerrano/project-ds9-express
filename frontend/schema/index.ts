@@ -41,7 +41,7 @@ export const ClientSchema = z.object({
 export const UserSchema = z.object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email(),
-    password: z.string().min(1, "contraseña is required"),
+    password: z.string().optional(),
     role: z.string().min(1, "contraseña is required"),
 });
 

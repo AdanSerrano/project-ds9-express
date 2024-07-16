@@ -63,7 +63,7 @@ const SaleRouter = (app: Router): Router => {
           error: "Venta no encontrada",
         });
       }
-      res.status(200).json(sale);
+      res.status(200).json(saleFormat(sale));
     } catch (error: unknown) {
       console.log(error);
       res.status(500).json({ error: "Internal server error." });
@@ -246,7 +246,7 @@ const SaleRouter = (app: Router): Router => {
 
   function totalSalePaymentByMonth(sales: any) {
     // se debe agrupar el total de ventas realizadas por año y mes por el campo saleDate con el formato yyyy-MMM.
-    
+
     const totalSalesByMonth = sales.reduce((acc: any, sale: any) => {
       const month = new Date(sale.saleDate).toLocaleString("es-PA", {
         month: "long",
@@ -261,7 +261,7 @@ const SaleRouter = (app: Router): Router => {
       acc[key] += sale.TotalSale;
 
       return acc;
-    } , {});
+    }, {});
 
   }
 

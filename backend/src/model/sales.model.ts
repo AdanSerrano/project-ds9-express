@@ -54,13 +54,6 @@ class SalesModel {
 
       const client = await this.database.client.findUnique({
         where: { id: clientId },
-        include: {
-          sales: {
-            include: {
-              details: true,
-            }
-          },
-        }
       });
 
       const calculateSubtotal = (detail: any) => {
@@ -83,7 +76,7 @@ class SalesModel {
 
       const totalSale = calculateTotal(details);
 
-      const sale = await this.database.sale.create({
+      const saleCreate = await this.database.sale.create({
         data: {
           saleDate: new Date(saleDate),
           clientId: clientId,
@@ -92,7 +85,7 @@ class SalesModel {
         },
       });
 
-      await this.database.saleDetail.createMany({
+      const saleDetail = await this.database.saleDetail.createMany({
         data: details.map((detail: any) => {
           return {
             quantity: detail.quantity,
@@ -100,10 +93,22 @@ class SalesModel {
             price: detail.price,
             tax: detail.tax,
             discount: detail.discount,
-            saleId: sale.id,
+            saleId: saleCreate.id,
           };
         }),
       });
+
+      const saleByid = await this.database.sale.findUnique({
+        where: {
+          id: saleCreate.id,
+        },
+        include: {
+          clients: true,
+          details: true,
+        },
+      });
+
+      console.log(saleByid)
 
       const subtotal = totalSale;
       const itbms = totalSale * 0.07;
@@ -161,25 +166,30 @@ class SalesModel {
               <thead>
                 <tr>
                   <th>Producto</th>
+                  <th>Cantidad</th>
                   <th>Precio</th>
                 </tr>
               </thead>
               <tbody>
-                ${client?.sales[0]?.details.map((detail: any) => `
-                  <tr>
-                    <td>${detail.product}</td>
-                    <td>$${detail.price.toFixed(2)}</td>
-                  </tr>
-                `).join('')}
+              ${saleByid?.details.map((detail: any) => `
+                <tr>
+                  <td>${detail.product}</td>
+                  <td>${detail.quantity}</td>
+                  <td>$${detail.price.toFixed(2)}</td>
+                </tr>
+              `).join("")}
                 <tr class="total-row">
+                  <td></td>
                   <td>Subtotal</td>
                   <td>$${subtotal.toFixed(2)}</td>
                 </tr>
                 <tr class="total-row">
+                <td></td>
                   <td>ITBMS</td>
                   <td>$${itbms.toFixed(2)}</td>
                 </tr>
                 <tr class="total-row">
+                <td></td>
                   <td><strong>Total</strong></td>
                   <td><strong>$${total.toFixed(2)}</strong></td>
                 </tr>
@@ -189,7 +199,7 @@ class SalesModel {
             <table align="center" width="100%" border="0" cellPadding="0" cellSpacing="0" role="presentation" style="text-align:center;margin-top:32px;margin-bottom:32px">
               <tbody>
                 <tr>
-                  <td><a href="http://localhost:3000/dashboard/orders/salesNotIsPaid/${sale.id}" style="line-height:100%;text-decoration:none;display:inline-block;max-width:100%;background-color:rgb(0,0,0);border-radius:0.25rem;color:rgb(255,255,255);font-size:12px;font-weight:600;text-decoration-line:none;text-align:center;padding-left:1.25rem;padding-right:1.25rem;padding-top:0.75rem;padding-bottom:0.75rem;padding:12px 20px 12px 20px" target="_blank"><span><!--[if mso]><i style="letter-spacing: 20px;mso-font-width:-100%;mso-text-raise:18" hidden>&nbsp;</i><![endif]--></span><span style="max-width:100%;display:inline-block;line-height:120%;mso-padding-alt:0px;mso-text-raise:9px">Pagar Ahora</span><span><!--[if mso]><i style="letter-spacing: 20px;mso-font-width:-100%" hidden>&nbsp;</i><![endif]--></span></a></td>
+                  <td><a href="http://localhost:3000/dashboard/orders/salesNotIsPaid/${saleCreate.id}" style="line-height:100%;text-decoration:none;display:inline-block;max-width:100%;background-color:rgb(0,0,0);border-radius:0.25rem;color:rgb(255,255,255);font-size:12px;font-weight:600;text-decoration-line:none;text-align:center;padding-left:1.25rem;padding-right:1.25rem;padding-top:0.75rem;padding-bottom:0.75rem;padding:12px 20px 12px 20px" target="_blank"><span><!--[if mso]><i style="letter-spacing: 20px;mso-font-width:-100%;mso-text-raise:18" hidden>&nbsp;</i><![endif]--></span><span style="max-width:100%;display:inline-block;line-height:120%;mso-padding-alt:0px;mso-text-raise:9px">Pagar Ahora</span><span><!--[if mso]><i style="letter-spacing: 20px;mso-font-width:-100%" hidden>&nbsp;</i><![endif]--></span></a></td>
                 </tr>
               </tbody>
             </table>
@@ -205,7 +215,7 @@ class SalesModel {
       `,
       });
 
-      return sale;
+      return saleCreate;
     } catch (error: unknown) {
       console.log("error createSales");
       console.error(error);

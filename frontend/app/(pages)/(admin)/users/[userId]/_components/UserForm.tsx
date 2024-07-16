@@ -38,8 +38,8 @@ export const UserForm = ({ initialData }: UserFormProps) => {
     const toastMessage = initialData ? 'Usuario Actualizado' : 'Usuario creado.';
     const action = initialData ? 'Guardar cambios' : 'Crear';
 
-    const form = useForm<RegisterFormValues>({
-        resolver: zodResolver(RegisterSchema),
+    const form = useForm<UserFormValues>({
+        resolver: zodResolver(UserSchema),
         defaultValues: {
             name: '',
             email: '',
@@ -60,7 +60,7 @@ export const UserForm = ({ initialData }: UserFormProps) => {
     }, [initialData, form]);
 
 
-    const onSubmit = (values: RegisterFormValues) => {
+    const onSubmit = (values: UserFormValues) => {
         setError('');
         setSuccess('');
         startTransition(async () => {
@@ -170,19 +170,22 @@ export const UserForm = ({ initialData }: UserFormProps) => {
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel className='text-white'>Contraseña</FormLabel>
-                                    <FormControl>
-                                        <PasswordInput disabled={isPending} placeholder="******" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {initialData ? null : (
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel className='text-white'>Contraseña</FormLabel>
+                                        <FormControl>
+                                            <PasswordInput disabled={isPending} placeholder="******" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )
+                        }
                         <FormField
                             control={form.control}
                             name="role"

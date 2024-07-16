@@ -36,16 +36,12 @@ class UserController {
     return await this.userService.findAllUsers();
   }
 
-  async updateUser(id: string, email: string, name: string, role: string, password: string) {
-    if (!email.trim() || !name.trim() || !role.trim() || !password.trim()) {
+  async updateUser(id: string, email: string, name: string, role: string) {
+    if (!email.trim() || !name.trim() || !role.trim()) {
       throw new Error("Email, name, password, and role are required.");
     }
 
-    const passwordNew = await this.verificationService.hashPassword(
-      password
-    );
-
-    return await this.userService.updateUser(id, { email, name, role, passwordNew });
+    return await this.userService.updateUser(id, { email, name, role });
   }
 
   async changePassword(

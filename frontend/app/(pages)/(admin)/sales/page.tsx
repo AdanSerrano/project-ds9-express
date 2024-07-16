@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react'
 import { SalesColumns } from './_components/columns'
 import { SalesClient } from './_components/client'
 import { getToken } from '@/lib/verificationToken'
+import { Item } from '@radix-ui/react-dropdown-menu'
 
 export default function SalesPage() {
     const [sales, setSales] = useState<Sale[] | null>([])
@@ -28,7 +29,6 @@ export default function SalesPage() {
         }
         fetchData();
     }, [])
-    console.log(sales)
 
     const formattedProducts: SalesColumns[] = sales?.map((item) => ({
         id: item.id,
@@ -37,7 +37,7 @@ export default function SalesPage() {
         saleDate: format(new Date(item.saleDate), "dd MMMM yyyy", { locale: es }),
         details: item.details?.length,
         clients: item.clients?.name,
-        isPayment: item.isPayment,
+        isPayment: item.isPayment ? 'PAGADO' : 'PENDIENTE',
     })) || [];
 
     return (
