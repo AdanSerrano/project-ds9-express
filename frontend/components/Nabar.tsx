@@ -1,4 +1,5 @@
-import React, { use, useEffect, useState } from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
 import { MaxWidthWrappper } from './MaxWidthWrapper'
 import Link from 'next/link'
 import { Button, buttonVariants } from './ui/button'
@@ -7,6 +8,7 @@ import { currentUser, isLoggedIn, LogoutClick } from '@/lib/verificationToken'
 import axios from 'axios'
 import { apiUrl } from '@/lib/api-url'
 import { User } from '@/interface'
+import { SheetNav } from './Sheet'
 
 export const NabarComponent = () => {
     const [isLoggedin, setIsLoggedin] = useState(false)
@@ -37,7 +39,11 @@ export const NabarComponent = () => {
                         PAY<span className='text-purple-500'>SALES</span>
                     </Link>
 
-                    <div className='h-full flex items-center justify-between sm:space-x-4'>
+                    <div className='flex sm:hidden'>
+                        <SheetNav />
+                    </div>
+
+                    <div className='hidden sm:flex h-full items-center justify-between sm:space-x-4'>
                         {!isLoggedin ? (
                             <>
                                 <Link
@@ -65,6 +71,7 @@ export const NabarComponent = () => {
                                     })}>
                                     Pagar factura
                                 </Link>
+
                             </>
                         ) : (
                             <>
