@@ -1,6 +1,7 @@
 import { FaceIcon, InstagramLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons"
 import { Button } from "./ui/button"
 import Link from "next/link"
+import Image from "next/image"
 
 export const Footer = () => {
     return (
@@ -16,7 +17,12 @@ export const Footer = () => {
                     {items.map((item, index) => (
                         <Button className="border text-gray-400" variant={'ghost'} size={'icon'} asChild key={index}>
                             <Link href={item.href}>
-                                {item.icon}
+                                <Image
+                                    src={item.icon}
+                                    alt="icon"
+                                    width={20}
+                                    height={20}
+                                />
                             </Link>
                         </Button>
                     ))
@@ -30,23 +36,23 @@ export const Footer = () => {
 
 const items = [
     {
-        href: '/',
-        icon: <InstagramLogoIcon className="h-5 w-5" />
+        href: '#',
+        icon: '/linkedin.svg'
     },
     {
-        href: '/about',
-        icon: <FaceIcon className="h-5 w-5" />
+        href: '#',
+        icon: '/github.svg'
     },
     {
-        href: '/contact',
-        icon: <TwitterLogoIcon className="h-5 w-5" />
+        href: '#',
+        icon: '/instagram.svg'
     },
     {
-        href: '/blog',
-        icon: <TwitterLogoIcon className="h-5 w-5" />
+        href: '#',
+        icon: '/twitter.svg'
     },
     {
-        href: '/services',
-        icon: <TwitterLogoIcon className="h-5 w-5" />
+        href: '#',
+        icon: '/whatsapp.svg'
     },
 ]
